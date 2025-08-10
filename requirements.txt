@@ -19,7 +19,7 @@ scipy==1.11.1             # Scientific computing
 networkx==3.1             # Graph algorithms and visualization
 
 # Cryptography for proof certificates
-cryptography==41.0.3      # Cryptographic operations
+cryptography==44.0.1      # Cryptographic operations
 
 # Optional: For running the streaming example
 apache-beam[gcp]==2.50.0  # Apache Beam for pipeline implementation

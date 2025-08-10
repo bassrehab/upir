@@ -50,6 +50,11 @@ htmlcov/
 streaming_pipeline_upir.json
 *.log
 
+# Folders to exclude
+docs/
+test_scripts/
+verify_claims.py
+
 # OS files
 .DS_Store
 Thumbs.db

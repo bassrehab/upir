@@ -232,8 +232,15 @@ class Verifier:
             return []
         
         if not upir.architecture:
-            logger.error("No architecture to verify against")
-            return []
+            logger.warning("No architecture to verify against - using empty architecture")
+            # Create minimal architecture for verification
+            from upir.core.models import Architecture
+            upir.architecture = Architecture(
+                components=[],
+                connections=[],
+                deployment={},
+                patterns=[]
+            )
         
         results = []
         

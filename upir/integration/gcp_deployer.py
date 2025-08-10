@@ -20,9 +20,13 @@ import hashlib
 # GCP client libraries
 from google.cloud import run_v2
 from google.cloud import monitoring_v3
-from google.cloud import deploy_v1
 from google.cloud import storage
 from google.cloud import pubsub_v1
+# Cloud Deploy is optional - not always needed
+try:
+    from google.cloud import deploy_v1
+except ImportError:
+    deploy_v1 = None
 from google.cloud.exceptions import GoogleCloudError
 from google.api_core import retry
 import google.auth
@@ -67,7 +71,10 @@ class RealGCPDeployer:
             # Initialize service clients
             self.run_client = run_v2.ServicesClient(credentials=self.credentials)
             self.monitoring_client = monitoring_v3.MetricServiceClient(credentials=self.credentials)
-            self.deploy_client = deploy_v1.CloudDeployClient(credentials=self.credentials)
+            if deploy_v1:
+                self.deploy_client = deploy_v1.CloudDeployClient(credentials=self.credentials)
+            else:
+                self.deploy_client = None
             self.storage_client = storage.Client(credentials=self.credentials)
             
             logger.info(f"Initialized GCP clients for project {self.config.project_id}")

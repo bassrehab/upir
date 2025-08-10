@@ -106,7 +106,7 @@ def design_pipeline_architecture() -> Architecture:
             "name": "pubsub_subscription",
             "type": "source",
             "config": {
-                "subscription": "projects/upir-468615/subscriptions/events-sub",
+                "subscription": "projects/upir-dev/subscriptions/events-sub",
                 "ack_deadline": 30,
                 "max_messages": 1000
             }
@@ -116,7 +116,7 @@ def design_pipeline_architecture() -> Architecture:
             "type": "processor",
             "config": {
                 "runner": "DataflowRunner",
-                "project": "upir-468615",
+                "project": "upir-dev",
                 "region": "us-central1",
                 "machine_type": "n1-standard-4",
                 "max_workers": 10,
@@ -139,7 +139,7 @@ def design_pipeline_architecture() -> Architecture:
             "name": "bigquery_sink",
             "type": "sink",
             "config": {
-                "dataset": "upir-468615.streaming_data",
+                "dataset": "upir-dev.streaming_data",
                 "table": "processed_events",
                 "write_method": "STREAMING_INSERTS",
                 "create_disposition": "CREATE_IF_NEEDED"
@@ -149,7 +149,7 @@ def design_pipeline_architecture() -> Architecture:
             "name": "dead_letter_queue",
             "type": "error_handler",
             "config": {
-                "topic": "projects/upir-468615/topics/dlq-events",
+                "topic": "projects/upir-dev/topics/dlq-events",
                 "max_retries": 3
             }
         }
@@ -390,9 +390,9 @@ def run_pipeline():
     
     pipeline_options = PipelineOptions(
         runner='DataflowRunner',
-        project='upir-468615',
+        project='upir-dev',
         region='us-central1',
-        temp_location='gs://upir-468615-temp/dataflow',
+        temp_location='gs://upir-dev-temp/dataflow',
         job_name='streaming-pipeline',
         streaming=True,
         max_num_workers=10,
@@ -417,7 +417,7 @@ def run_pipeline():
         events = (
             pipeline
             | 'ReadFromPubSub' >> ReadFromPubSub(
-                subscription='projects/upir-468615/subscriptions/events-sub',
+                subscription='projects/upir-dev/subscriptions/events-sub',
                 with_attributes=True
             )
         )
@@ -437,7 +437,7 @@ def run_pipeline():
                 window.FixedWindows(60)  # 1-minute windows
             )
             | 'WriteToBigQuery' >> WriteToBigQuery(
-                table='upir-468615:streaming_data.processed_events',
+                table='upir-dev:streaming_data.processed_events',
                 schema=table_schema,
                 write_disposition=beam.io.BigQueryDisposition.WRITE_APPEND,
                 create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
@@ -448,7 +448,7 @@ def run_pipeline():
         (
             processed.errors
             | 'WriteErrorsToPubSub' >> beam.io.WriteToPubSub(
-                topic='projects/upir-468615/topics/dlq-events'
+                topic='projects/upir-dev/topics/dlq-events'
             )
         )
 

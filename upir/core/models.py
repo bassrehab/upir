@@ -148,6 +148,11 @@ class FormalSpecification:
             "assumptions": self.assumptions
         }
     
+    def hash(self) -> str:
+        """Generate hash of specification for tracking."""
+        spec_json = json.dumps(self.to_dict(), sort_keys=True)
+        return hashlib.sha256(spec_json.encode()).hexdigest()
+    
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'FormalSpecification':
         """Deserialize from dictionary."""

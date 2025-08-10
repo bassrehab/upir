@@ -116,7 +116,7 @@ class UPIROrchestrator:
         # Core components
         self.verifier = Verifier(timeout=self.config.verification_timeout)
         self.synthesizer = Synthesizer()
-        self.learner = ArchitectureLearner()
+        self.learner = None  # Will be initialized with UPIR
         self.pattern_library = PatternLibrary(self.config.pattern_library_path)
         
         # Workflow tracking
@@ -278,14 +278,14 @@ class UPIROrchestrator:
         # If we already have an architecture from patterns, synthesize from it
         if upir.architecture:
             # Create sketch from existing architecture
-            sketch = self.synthesizer.create_sketch_from_architecture(upir.architecture)
+            sketch = self.synthesizer.generate_sketch(upir.specification, upir.architecture)
         else:
             # Create sketch from specification
-            sketch = self.synthesizer.create_sketch(upir.specification)
+            sketch = self.synthesizer.generate_sketch(upir.specification)
         
         # Run CEGIS synthesis
         implementation = self.synthesizer.synthesize(
-            specification=upir.specification,
+            spec=upir.specification,
             sketch=sketch,
             max_iterations=self.config.synthesis_max_iterations
         )
@@ -424,6 +424,10 @@ class UPIROrchestrator:
         """Continuous learning loop for architecture improvement."""
         logger.info("Starting learning loop")
         
+        # Initialize learner with UPIR
+        if not self.learner:
+            self.learner = ArchitectureLearner(upir)
+        
         while self.state in [WorkflowState.DEPLOYED, WorkflowState.LEARNING, WorkflowState.OPTIMIZING]:
             # Wait for learning interval
             await asyncio.sleep(self.config.learning_interval)
@@ -488,6 +492,10 @@ class UPIROrchestrator:
         """Optimize architecture based on current metrics."""
         logger.info("Starting optimization cycle")
         self.state = WorkflowState.OPTIMIZING
+        
+        # Initialize learner if needed
+        if not self.learner:
+            self.learner = ArchitectureLearner(upir)
         
         # Get optimization suggestions from learner
         suggestions = self.learner.suggest_optimization(upir)

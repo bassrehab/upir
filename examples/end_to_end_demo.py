@@ -271,13 +271,13 @@ async def main():
     print("6. 🎯 Optimization - Continuously improve architecture")
     print()
     
-    # Configure the system
+    # Configure the system (disable features that require Z3)
     config = WorkflowConfig(
-        enable_verification=True,
-        enable_synthesis=True,
+        enable_verification=False,  # Disabled since Z3 not installed
+        enable_synthesis=False,     # Disabled since Z3 not installed
         enable_deployment=True,
         enable_learning=True,
-        enable_pattern_discovery=True,
+        enable_pattern_discovery=False,  # Disabled since sklearn not installed
         verification_timeout=30000,
         synthesis_max_iterations=100,
         learning_interval=60,  # Learn every minute

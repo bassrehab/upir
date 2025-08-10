@@ -27,7 +27,7 @@ google-cloud-pubsub==2.18.1  # Pub/Sub client
 google-cloud-bigquery==3.11.4  # BigQuery client
 
 # Development tools
-black==23.7.0             # Code formatting
+black==24.3.0             # Code formatting
 flake8==6.1.0             # Linting
 mypy==1.5.1               # Type checking
 ipython==8.14.0           # Interactive development

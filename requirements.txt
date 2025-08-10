@@ -21,10 +21,18 @@ networkx==3.1             # Graph algorithms and visualization
 # Cryptography for proof certificates
 cryptography==41.0.3      # Cryptographic operations
 
-# Optional: For running the streaming example
-apache-beam[gcp]==2.50.0  # Apache Beam for pipeline implementation
-google-cloud-pubsub==2.18.1  # Pub/Sub client
+# REQUIRED: Google Cloud Platform dependencies for REAL implementations
+google-cloud-run==0.10.0       # Cloud Run for deployments
+google-cloud-monitoring==2.17.0  # Cloud Monitoring for real metrics
+google-cloud-deploy==1.15.0    # Cloud Deploy for deployment strategies
+google-cloud-storage==2.13.0   # GCS for build artifacts
+google-cloud-pubsub==2.18.1    # Pub/Sub client
 google-cloud-bigquery==3.11.4  # BigQuery client
+google-auth==2.25.0            # GCP authentication
+google-api-core==2.15.0        # Core GCP API support
+
+# Apache Beam for pipeline implementation
+apache-beam[gcp]==2.50.0       # Apache Beam with GCP support
 
 # Development tools
 black==23.7.0             # Code formatting

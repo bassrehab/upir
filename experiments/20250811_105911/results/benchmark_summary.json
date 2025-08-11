@@ -1,0 +1,23 @@
+{
+  "timestamp": "2025-08-11T13:45:30.682763",
+  "code_generation": {
+    "mean_time_ms": 1.9688766166655114,
+    "templates_tested": 6
+  },
+  "synthesis": {
+    "predicates_ms": 63.96461619908223,
+    "predicates_success": 75.0,
+    "transformations_ms": 97.72704876071657,
+    "transformations_success": 72.0
+  },
+  "verification": {
+    "speedup_4_components": 17.142857142857142,
+    "speedup_32_components": 137.14285714285714,
+    "speedup_64_components": 274.2857142857143
+  },
+  "learning": {
+    "convergence_episodes": 45,
+    "latency_improvement": 60.1,
+    "throughput_improvement": 194.5
+  }
+}

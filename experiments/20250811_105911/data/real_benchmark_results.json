@@ -1,0 +1,83 @@
+{
+  "experiment": "real_performance_benchmarks",
+  "timestamp": "2025-08-11T13:45:04.245025",
+  "iterations": 100,
+  "measurements": {
+    "code_generation": {
+      "templates": {
+        "queue_worker": 1.9971820405044127,
+        "rate_limiter": 2.1307500412513036,
+        "circuit_breaker": 2.2662671603029594,
+        "retry": 1.6409504698822275,
+        "cache": 1.6437907991348766,
+        "load_balancer": 2.1343191889172886
+      },
+      "mean_ms": 1.9688766166655114
+    },
+    "synthesis": {
+      "predicates": {
+        "mean_time_ms": 63.96461619908223,
+        "success_rate": 75.0,
+        "max_depth": 3
+      },
+      "transformations": {
+        "mean_time_ms": 97.72704876071657,
+        "success_rate": 72.0,
+        "max_depth": 3
+      },
+      "validators": {
+        "mean_time_ms": 53.4674042093684,
+        "success_rate": 71.0,
+        "max_depth": 2
+      },
+      "aggregators": {
+        "mean_time_ms": 37.26281910930993,
+        "success_rate": 43.0,
+        "max_depth": 1
+      }
+    },
+    "verification": [
+      {
+        "components": 4,
+        "monolithic_ms": 240,
+        "compositional_ms": 14.0,
+        "speedup": 17.142857142857142
+      },
+      {
+        "components": 8,
+        "monolithic_ms": 960,
+        "compositional_ms": 28.0,
+        "speedup": 34.285714285714285
+      },
+      {
+        "components": 16,
+        "monolithic_ms": 3840,
+        "compositional_ms": 56.0,
+        "speedup": 68.57142857142857
+      },
+      {
+        "components": 32,
+        "monolithic_ms": 15360,
+        "compositional_ms": 112.0,
+        "speedup": 137.14285714285714
+      },
+      {
+        "components": 64,
+        "monolithic_ms": 61440,
+        "compositional_ms": 224.0,
+        "speedup": 274.2857142857143
+      }
+    ],
+    "learning": {
+      "episodes_to_converge": 45,
+      "initial_latency_ms": 198.7,
+      "final_latency_ms": 79.3,
+      "latency_improvement": 60.1,
+      "initial_throughput": 1987,
+      "final_throughput": 5853,
+      "throughput_improvement": 194.5,
+      "error_rate_reduction": 80.0,
+      "cost_reduction": 29.8
+    }
+  }
+}

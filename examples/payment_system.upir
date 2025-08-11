@@ -1,0 +1,253 @@
+# UPIR - Universal Plan Intermediate Representation
+# This is the actual intermediate representation format
+# Version: 1.0
+# Generated: 2025-08-11
+
+system PaymentProcessingPipeline {
+  
+  # Component declarations with formal specifications
+  components {
+    
+    rate_limiter: RateLimiter {
+      pattern: "rate_limiter"
+      requirements {
+        requests_per_second: 1000
+        burst_size: 100
+      }
+      properties {
+        invariant: "token_count >= 0 && token_count <= burst_size"
+        guarantee: "rate <= requests_per_second"
+      }
+      synthesize_params: true
+    }
+    
+    validator: Validator {
+      pattern: "synthesized_predicate"
+      synthesis {
+        type: "predicate"
+        examples: [
+          {input: {amount: 100}, output: true},
+          {input: {amount: 0}, output: false},
+          {input: {amount: -10}, output: false},
+          {input: {amount: 1000000}, output: false}
+        ]
+        max_depth: 3
+      }
+      properties {
+        deterministic: true
+        pure: true
+      }
+    }
+    
+    queue_worker: QueueWorker {
+      pattern: "queue_worker"
+      requirements {
+        throughput: 5000
+        max_latency_ms: 100
+        batch_size: "${optimize}"  # Z3 will synthesize
+        workers: "${optimize}"      # Z3 will synthesize
+      }
+      constraints {
+        "batch_size * workers * 10 >= throughput"
+        "batch_size <= 100"
+        "workers <= 200"
+      }
+      properties {
+        guarantee: "no_data_loss"
+        guarantee: "bounded_latency < max_latency_ms"
+        guarantee: "exactly_once_processing"
+      }
+    }
+    
+    circuit_breaker: CircuitBreaker {
+      pattern: "circuit_breaker"
+      requirements {
+        failure_threshold: 5
+        recovery_timeout_seconds: 10
+        success_threshold: 2
+      }
+      properties {
+        safety: "failed_requests < failure_threshold => state != OPEN"
+        liveness: "eventually(state == CLOSED)"
+        guarantee: "automatic_recovery"
+      }
+    }
+    
+    database: Database {
+      pattern: "storage"
+      requirements {
+        consistency: "strong"
+        durability: true
+      }
+      interface {
+        store(payment: Payment): Result<PaymentId>
+        retrieve(id: PaymentId): Result<Payment>
+      }
+    }
+  }
+  
+  # Data flow connections
+  connections {
+    flow: rate_limiter -> validator -> queue_worker -> circuit_breaker -> database
+    
+    edge rate_limiter -> validator {
+      when: "rate_limiter.allow_request() == true"
+      data: "Request"
+    }
+    
+    edge validator -> queue_worker {
+      when: "validator.is_valid(request) == true"
+      data: "ValidatedRequest"
+    }
+    
+    edge queue_worker -> circuit_breaker {
+      batch: true
+      max_batch_size: "${queue_worker.batch_size}"
+      data: "ProcessedBatch"
+    }
+    
+    edge circuit_breaker -> database {
+      retry: true
+      max_retries: 3
+      backoff: "exponential"
+      data: "Payment"
+    }
+  }
+  
+  # System-level properties to verify
+  properties {
+    # Safety properties
+    safety no_invalid_payments {
+      formula: "G(database.stored => validator.validated)"
+      description: "Only validated payments reach database"
+    }
+    
+    safety rate_limit_enforced {
+      formula: "G(throughput <= rate_limiter.max_rate)"
+      description: "System never exceeds rate limit"
+    }
+    
+    # Liveness properties
+    liveness all_valid_processed {
+      formula: "G(validator.validated => F(database.stored))"
+      description: "All valid payments eventually stored"
+    }
+    
+    # Performance properties
+    performance latency_bound {
+      metric: "p99_latency"
+      bound: "< 100ms"
+      confidence: 0.99
+    }
+    
+    performance throughput_target {
+      metric: "average_throughput"
+      bound: ">= 4500 req/s"
+      window: "1 minute"
+    }
+  }
+  
+  # Compositional verification strategy
+  verification {
+    strategy: "compositional"
+    
+    # Verify components independently
+    phase component_verification {
+      parallel: true
+      timeout: "10s"
+      cache: true
+    }
+    
+    # Verify interfaces
+    phase interface_verification {
+      check: "type_compatibility"
+      check: "protocol_compliance"
+    }
+    
+    # Compose proofs
+    phase composition {
+      method: "assume_guarantee"
+      proof_cache: "enabled"
+    }
+  }
+  
+  # Code generation targets
+  targets {
+    language: ["python", "go", "javascript"]
+    
+    python {
+      version: "3.9+"
+      async: true
+      typing: "strict"
+    }
+    
+    go {
+      version: "1.20+"
+      concurrency: "goroutines"
+    }
+    
+    javascript {
+      version: "ES2020"
+      runtime: "node"
+      async: "promises"
+    }
+  }
+  
+  # Learning optimization
+  optimization {
+    algorithm: "PPO"
+    
+    objectives {
+      minimize: "latency"
+      maximize: "throughput"
+      minimize: "error_rate"
+      minimize: "cost"
+    }
+    
+    constraints {
+      "error_rate < 0.01"
+      "availability > 0.999"
+    }
+    
+    hyperparameters {
+      learning_rate: 0.0003
+      episodes: 100
+      batch_size: 32
+    }
+  }
+}
+
+# Type definitions
+types {
+  Payment {
+    id: String
+    amount: Float
+    currency: String
+    timestamp: Integer
+    metadata: Map<String, Any>
+  }
+  
+  Request {
+    payment: Payment
+    headers: Map<String, String>
+  }
+  
+  ValidatedRequest extends Request {
+    validation_timestamp: Integer
+    validator_version: String
+  }
+  
+  ProcessedBatch {
+    payments: List<Payment>
+    batch_id: String
+    processed_at: Integer
+  }
+  
+  Result<T> = Success(T) | Failure(Error)
+  
+  Error {
+    code: Integer
+    message: String
+    retry_after: Optional<Integer>
+  }
+}

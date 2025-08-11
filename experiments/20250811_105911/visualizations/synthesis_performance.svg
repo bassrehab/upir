@@ -1,0 +1,39 @@
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="400" fill="white" stroke="black"/>
+  <text x="300" y="30" font-size="16" font-weight="bold" text-anchor="middle">Program Synthesis Performance (Measured)</text>
+  
+  <!-- Two charts side by side -->
+  <!-- Left: Time -->
+  <text x="150" y="60" font-size="12" font-weight="bold" text-anchor="middle">Synthesis Time</text>
+  <g transform="translate(0, 20)">
+    <rect x="80" y="100" width="127.92923239816446" height="30" fill="purple" opacity="0.7"/>
+    <text x="75" y="120" font-size="10" text-anchor="end">predicat</text>
+    <text x="212.92923239816446" y="120" font-size="10">64.0ms</text>
+    <rect x="80" y="140" width="195.45409752143314" height="30" fill="purple" opacity="0.7"/>
+    <text x="75" y="160" font-size="10" text-anchor="end">transfor</text>
+    <text x="280.45409752143314" y="160" font-size="10">97.7ms</text>
+    <rect x="80" y="180" width="106.9348084187368" height="30" fill="purple" opacity="0.7"/>
+    <text x="75" y="200" font-size="10" text-anchor="end">validato</text>
+    <text x="191.9348084187368" y="200" font-size="10">53.5ms</text>
+    <rect x="80" y="220" width="74.52563821861986" height="30" fill="purple" opacity="0.7"/>
+    <text x="75" y="240" font-size="10" text-anchor="end">aggregat</text>
+    <text x="159.52563821861986" y="240" font-size="10">37.3ms</text>
+  </g>
+  
+  <!-- Right: Success Rate -->
+  <text x="450" y="60" font-size="12" font-weight="bold" text-anchor="middle">Success Rate</text>
+  <g transform="translate(300, 20)">
+    <rect x="80" y="100" width="112.5" height="30" fill="orange" opacity="0.7"/>
+    <text x="75" y="120" font-size="10" text-anchor="end">predicat</text>
+    <text x="197.5" y="120" font-size="10">75%</text>
+    <rect x="80" y="140" width="108.0" height="30" fill="orange" opacity="0.7"/>
+    <text x="75" y="160" font-size="10" text-anchor="end">transfor</text>
+    <text x="193.0" y="160" font-size="10">72%</text>
+    <rect x="80" y="180" width="106.5" height="30" fill="orange" opacity="0.7"/>
+    <text x="75" y="200" font-size="10" text-anchor="end">validato</text>
+    <text x="191.5" y="200" font-size="10">71%</text>
+    <rect x="80" y="220" width="64.5" height="30" fill="orange" opacity="0.7"/>
+    <text x="75" y="240" font-size="10" text-anchor="end">aggregat</text>
+    <text x="149.5" y="240" font-size="10">43%</text>
+  </g>
+</svg>

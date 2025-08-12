@@ -126,19 +126,37 @@ def verify_specification():
 def synthesize_parameters():
     """API endpoint for parameter synthesis."""
     data = request.json
-    constraints = data.get('constraints', {})
+    constraints_text = data.get('constraints', '')
     
     # Simulate Z3 synthesis
     time.sleep(0.05)
     
+    # Parse constraints to simulate different outputs
+    # This is a demonstration - actual UPIR uses Z3 SMT solver
+    base_batch = 94
+    base_workers = 14
+    
+    # Adjust parameters based on constraints (simulated)
+    if 'throughput >= 10000' in constraints_text:
+        base_batch = 128
+        base_workers = 20
+    elif 'throughput >= 5000' in constraints_text:
+        base_batch = 94
+        base_workers = 14
+    elif 'latency <= 50' in constraints_text:
+        base_batch = 32
+        base_workers = 8
+        
+    throughput = base_batch * base_workers * 10
+    
     # Generate optimized parameters
     synthesized = {
-        'batch_size': 94,
-        'workers': 14,
-        'throughput': 13160,
-        'resource_usage': 108,
+        'batch_size': base_batch,
+        'workers': base_workers,
+        'throughput': throughput,
+        'resource_usage': base_batch + base_workers,
         'synthesis_time': 114.1,  # ms
-        'solver': 'Z3 SMT'
+        'solver': 'Z3 SMT (simulated for demo)'
     }
     
     return jsonify({
@@ -179,18 +197,24 @@ def paper():
         'url': 'http://go/upir:paper'
     })
 
-def generate_python_code(template_type, template):
+def generate_python_code(template_type, template, params=None):
     """Generate Python code for template."""
+    # Use provided parameters or defaults
+    if params is None:
+        params = template.get('parameters', {})
+    
     if template_type == 'queue_worker':
-        return '''import asyncio
+        batch_size = params.get('batch_size', 94)
+        workers = params.get('workers', 14)
+        return f'''import asyncio
 from typing import List, Any
 
 class QueueWorker:
     """UPIR-generated batch processor with Z3-optimized parameters."""
     
     def __init__(self):
-        self.batch_size = 94  # Z3 optimized
-        self.workers = 14     # Z3 optimized
+        self.batch_size = {batch_size}  # Z3 optimized
+        self.workers = {workers}     # Z3 optimized
         self.queue = asyncio.Queue()
         
     async def process_batch(self, items: List[Any]):

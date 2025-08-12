@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}UPIR - Universal Plan Intermediate Representation{% endblock %}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="/static/css/style.css" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="alternate icon" href="/static/favicon.ico">
+    <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet">
+    <link href="/static/css/minimal-professional.css" rel="stylesheet">
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -17,15 +18,16 @@
                     <span class="logo">UPIR</span>
                     <span class="tagline">Universal Plan IR</span>
                 </a>
+                <span class="go-link">go/upir</span>
             </div>
             <ul class="nav-menu">
-                <li><a href="/" class="nav-link">Home</a></li>
-                <li><a href="/overview" class="nav-link">Overview</a></li>
-                <li><a href="/demo" class="nav-link">Demo</a></li>
-                <li><a href="/documentation" class="nav-link">Docs</a></li>
-                <li><a href="/applications" class="nav-link">Applications</a></li>
-                <li><a href="http://go/upir:paper" class="nav-link" target="_blank">Paper</a></li>
-                <li><a href="http://go/upir:code" class="nav-link" target="_blank">Code</a></li>
+                <li><a href="/" class="nav-link"><i class="lni lni-home"></i> Home</a></li>
+                <li><a href="/overview" class="nav-link"><i class="lni lni-layers"></i> Overview</a></li>
+                <li><a href="/demo" class="nav-link"><i class="lni lni-code-alt"></i> Demo</a></li>
+                <li><a href="/documentation" class="nav-link"><i class="lni lni-book"></i> Docs</a></li>
+                <li><a href="/applications" class="nav-link"><i class="lni lni-rocket"></i> Applications</a></li>
+                <li><a href="http://go/upir:paper" class="nav-link" target="_blank"><i class="lni lni-files"></i> Paper</a></li>
+                <li><a href="http://go/upir:code" class="nav-link" target="_blank"><i class="lni lni-code-alt"></i> Code</a></li>
             </ul>
         </div>
     </nav>

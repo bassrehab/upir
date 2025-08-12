@@ -8,6 +8,11 @@
         <h1>Interactive UPIR Demo</h1>
         <p class="lead">Try UPIR's code generation, verification, and synthesis capabilities</p>
         
+        <div class="demo-note">
+            <i class="lni lni-information"></i>
+            <strong>Note:</strong> This is a demonstration of UPIR's capabilities. The actual UPIR system uses Z3 SMT solver for constraint satisfaction and program synthesis. Parameters shown here are simulated for demo purposes.
+        </div>
+        
         <div class="demo-grid">
             <!-- Left Panel: Input -->
             <div class="demo-panel">
@@ -40,9 +45,9 @@ latency <= 100
 batch_size * workers >= throughput/10"></textarea>
                 
                 <div class="demo-actions">
-                    <button id="generate-btn" class="btn btn-primary">Generate Code</button>
-                    <button id="verify-btn" class="btn btn-secondary">Verify</button>
-                    <button id="synthesize-btn" class="btn btn-secondary">Synthesize Parameters</button>
+                    <button id="generate-btn" class="btn btn-primary"><i class="lni lni-code"></i> Generate Code</button>
+                    <button id="verify-btn" class="btn btn-secondary"><i class="lni lni-checkmark-circle"></i> Verify</button>
+                    <button id="synthesize-btn" class="btn btn-secondary"><i class="lni lni-cogs"></i> Synthesize Parameters</button>
                 </div>
             </div>
             

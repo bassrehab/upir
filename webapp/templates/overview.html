@@ -32,21 +32,21 @@
                 
                 <div class="key-points">
                     <div class="point">
-                        <div class="point-icon">📝</div>
+                        <div class="point-icon"><i class="lni lni-pencil-alt"></i></div>
                         <div>
                             <strong>You describe WHAT you want</strong>
                             <p>Instead of writing thousands of lines of code, you write a simple specification of your system's requirements</p>
                         </div>
                     </div>
                     <div class="point">
-                        <div class="point-icon">🤖</div>
+                        <div class="point-icon"><i class="lni lni-cog"></i></div>
                         <div>
                             <strong>UPIR generates HOW to build it</strong>
                             <p>The system automatically creates optimized, verified code that meets your requirements</p>
                         </div>
                     </div>
                     <div class="point">
-                        <div class="point-icon">✅</div>
+                        <div class="point-icon"><i class="lni lni-checkmark-circle"></i></div>
                         <div>
                             <strong>Guaranteed correctness</strong>
                             <p>Mathematical verification ensures the generated code works correctly and won't fail</p>
@@ -61,22 +61,26 @@
             <h2>Why Should You Care?</h2>
             <div class="value-grid">
                 <div class="value-card">
-                    <h3>🚀 Speed</h3>
+                    <div class="value-icon"><i class="lni lni-rocket"></i></div>
+                    <h3>Speed</h3>
                     <p><strong>274× faster</strong> than traditional approaches</p>
                     <p class="detail">What took weeks now takes minutes</p>
                 </div>
                 <div class="value-card">
-                    <h3>💰 Cost</h3>
+                    <div class="value-icon"><i class="lni lni-coin"></i></div>
+                    <h3>Cost</h3>
                     <p><strong>90% reduction</strong> in development time</p>
                     <p class="detail">Less debugging, fewer production issues</p>
                 </div>
                 <div class="value-card">
-                    <h3>🛡️ Reliability</h3>
+                    <div class="value-icon"><i class="lni lni-shield"></i></div>
+                    <h3>Reliability</h3>
                     <p><strong>Zero critical bugs</strong> in generated code</p>
                     <p class="detail">Mathematically verified for correctness</p>
                 </div>
                 <div class="value-card">
-                    <h3>📈 Scale</h3>
+                    <div class="value-icon"><i class="lni lni-graph"></i></div>
+                    <h3>Scale</h3>
                     <p><strong>Auto-optimized</strong> for your workload</p>
                     <p class="detail">Handles millions of requests automatically</p>
                 </div>
@@ -91,7 +95,7 @@
                 
                 <div class="comparison">
                     <div class="traditional-way">
-                        <h4>❌ Traditional Approach</h4>
+                        <h4><i class="lni lni-close"></i> Traditional Approach</h4>
                         <ul>
                             <li>6 engineers × 3 months = 18 engineer-months</li>
                             <li>~50,000 lines of code</li>
@@ -102,7 +106,7 @@
                     </div>
                     
                     <div class="upir-way">
-                        <h4>✅ With UPIR</h4>
+                        <h4><i class="lni lni-checkmark-circle"></i> With UPIR</h4>
                         <ul>
                             <li>1 engineer × 1 day</li>
                             <li>~200 lines of specification</li>
@@ -188,261 +192,10 @@
             <h2>Want to Learn More?</h2>
             <p>See UPIR in action or dive into the technical details</p>
             <div class="cta-buttons">
-                <a href="/demo" class="btn btn-primary btn-large">Try Interactive Demo</a>
-                <a href="/documentation" class="btn btn-secondary btn-large">Technical Documentation</a>
+                <a href="/demo" class="btn btn-primary btn-large"><i class="lni lni-play"></i> Try Interactive Demo</a>
+                <a href="/documentation" class="btn btn-secondary btn-large"><i class="lni lni-book"></i> Technical Documentation</a>
             </div>
         </div>
     </div>
 </section>
-
-<style>
-.overview-hero {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 3rem 0;
-    text-align: center;
-}
-
-.overview-hero h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.overview-section {
-    padding: 3rem 0;
-}
-
-.overview-block {
-    margin-bottom: 4rem;
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.overview-block h2 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    color: var(--dark);
-}
-
-.simple-explanation {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: var(--gray);
-}
-
-.simple-explanation p {
-    margin-bottom: 1rem;
-}
-
-.analogy-box {
-    background: var(--light-gray);
-    padding: 1.5rem;
-    border-left: 4px solid var(--primary-color);
-    border-radius: 4px;
-    margin: 1.5rem 0;
-    font-style: italic;
-}
-
-.key-points {
-    margin: 2rem 0;
-}
-
-.point {
-    display: flex;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-    align-items: flex-start;
-}
-
-.point-icon {
-    font-size: 2rem;
-    flex-shrink: 0;
-}
-
-.point strong {
-    display: block;
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
-    color: var(--dark);
-}
-
-.value-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin: 2rem 0;
-}
-
-.value-card {
-    background: white;
-    border: 1px solid var(--border);
-    padding: 1.5rem;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.value-card h3 {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.value-card p {
-    margin: 0.5rem 0;
-}
-
-.value-card .detail {
-    font-size: 0.9rem;
-    color: var(--gray);
-}
-
-.example-scenario {
-    background: white;
-    border: 1px solid var(--border);
-    padding: 2rem;
-    border-radius: 8px;
-}
-
-.example-scenario h3 {
-    color: var(--primary-color);
-    margin-bottom: 1.5rem;
-}
-
-.comparison {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    margin-top: 1.5rem;
-}
-
-.traditional-way,
-.upir-way {
-    padding: 1.5rem;
-    border-radius: 8px;
-}
-
-.traditional-way {
-    background: rgba(234, 67, 53, 0.05);
-    border: 1px solid rgba(234, 67, 53, 0.2);
-}
-
-.upir-way {
-    background: rgba(52, 168, 83, 0.05);
-    border: 1px solid rgba(52, 168, 83, 0.2);
-}
-
-.traditional-way h4 {
-    color: #ea4335;
-    margin-bottom: 1rem;
-}
-
-.upir-way h4 {
-    color: #34a853;
-    margin-bottom: 1rem;
-}
-
-.traditional-way ul,
-.upir-way ul {
-    list-style: none;
-    padding: 0;
-}
-
-.traditional-way li,
-.upir-way li {
-    padding: 0.5rem 0;
-    padding-left: 1.5rem;
-    position: relative;
-}
-
-.traditional-way li:before {
-    content: "•";
-    color: #ea4335;
-    position: absolute;
-    left: 0;
-}
-
-.upir-way li:before {
-    content: "✓";
-    color: #34a853;
-    position: absolute;
-    left: 0;
-}
-
-.faq-section {
-    margin-top: 4rem;
-    padding-top: 3rem;
-    border-top: 1px solid var(--border);
-}
-
-.faq-section h2 {
-    font-size: 2rem;
-    margin-bottom: 2rem;
-    text-align: center;
-}
-
-.faq-item {
-    margin-bottom: 2rem;
-    padding: 1.5rem;
-    background: var(--light-gray);
-    border-radius: 8px;
-}
-
-.faq-item h3 {
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
-}
-
-.faq-item p {
-    line-height: 1.7;
-    color: var(--gray);
-}
-
-.faq-item ul {
-    margin-top: 0.5rem;
-    margin-left: 1.5rem;
-    color: var(--gray);
-}
-
-.faq-item a {
-    color: var(--primary-color);
-    text-decoration: none;
-}
-
-.faq-item a:hover {
-    text-decoration: underline;
-}
-
-.overview-cta {
-    text-align: center;
-    margin-top: 4rem;
-    padding: 3rem;
-    background: var(--light-gray);
-    border-radius: 8px;
-}
-
-.overview-cta h2 {
-    margin-bottom: 1rem;
-}
-
-.overview-cta p {
-    color: var(--gray);
-    margin-bottom: 2rem;
-}
-
-@media (max-width: 768px) {
-    .comparison {
-        grid-template-columns: 1fr;
-    }
-    
-    .value-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .point {
-        flex-direction: column;
-        text-align: center;
-    }
-}
-</style>
 {% endblock %}

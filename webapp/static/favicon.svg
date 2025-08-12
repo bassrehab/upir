@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="6" fill="#0F172A"/>
+  <path d="M16 6L8 10v8c0 4.4 3.07 8.59 7.2 9.6a10.04 10.04 0 0 0 1.6 0C21.93 26.59 24 22.4 24 18v-8l-8-4z" fill="#3B82F6" opacity="0.9"/>
+  <path d="M16 8L10 11v6c0 3.3 2.3 6.44 5.4 7.2a7.53 7.53 0 0 0 1.2 0c3.1-.76 5.4-3.9 5.4-7.2v-6l-6-3z" fill="#ffffff" opacity="0.2"/>
+  <text x="16" y="19" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="bold" text-anchor="middle" fill="#ffffff">U</text>
+</svg>

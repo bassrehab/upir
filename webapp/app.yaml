@@ -1,0 +1,18 @@
+runtime: python310
+
+# For internal Google projects
+env_variables:
+  GAE_USE_SOCKETS_HTTPLIB: 'true'
+
+handlers:
+- url: /static
+  static_dir: static
+  secure: always
+
+- url: /.*
+  script: auto
+  secure: always
+  
+# Authentication for internal Google users
+# Note: This app was created with gmail.com auth domain
+# For proper google.com authentication, the app would need to be recreated

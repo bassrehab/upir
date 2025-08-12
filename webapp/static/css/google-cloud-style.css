@@ -1,0 +1,622 @@
+/* Google Cloud / g3doc Style Design System for UPIR */
+
+:root {
+    /* Google Cloud Blue Palette */
+    --gcp-blue-900: #0d47a1;
+    --gcp-blue-700: #1565c0;
+    --gcp-blue-600: #1976d2;
+    --gcp-blue-500: #2196f3;
+    --gcp-blue-400: #42a5f5;
+    --gcp-blue-300: #64b5f6;
+    --gcp-blue-200: #90caf9;
+    --gcp-blue-100: #bbdefb;
+    --gcp-blue-50: #e3f2fd;
+    
+    /* Google Brand Colors */
+    --google-blue: #4285f4;
+    --google-red: #ea4335;
+    --google-yellow: #fbbc04;
+    --google-green: #34a853;
+    
+    /* Google Cloud Secondary Colors */
+    --gcp-orange: #ff6f00;
+    --gcp-purple: #673ab7;
+    --gcp-teal: #00897b;
+    --gcp-pink: #d81b60;
+    
+    /* Text Colors (Material Design) */
+    --text-primary: #202124;
+    --text-secondary: #5f6368;
+    --text-disabled: #9aa0a6;
+    --text-hint: #bdc1c6;
+    
+    /* Background Colors */
+    --bg-white: #ffffff;
+    --bg-surface: #f8f9fa;
+    --bg-elevated: #ffffff;
+    --bg-canvas: #f1f3f4;
+    
+    /* Border Colors */
+    --border-subtle: #dadce0;
+    --border-default: #e8eaed;
+    --border-strong: #bdc1c6;
+    
+    /* Typography - Google Sans / Roboto */
+    --font-google-sans: 'Google Sans', 'Product Sans', 'Roboto', -apple-system, sans-serif;
+    --font-roboto: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-roboto-mono: 'Roboto Mono', 'Courier New', monospace;
+    
+    /* Spacing (4px grid) */
+    --spacing-1: 4px;
+    --spacing-2: 8px;
+    --spacing-3: 12px;
+    --spacing-4: 16px;
+    --spacing-5: 20px;
+    --spacing-6: 24px;
+    --spacing-8: 32px;
+    --spacing-10: 40px;
+    --spacing-12: 48px;
+    --spacing-16: 64px;
+    
+    /* Elevation (Material Design) */
+    --elevation-1: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+    --elevation-2: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 2px 6px 2px rgba(60, 64, 67, 0.15);
+    --elevation-3: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+    --elevation-4: 0 2px 3px 0 rgba(60, 64, 67, 0.3), 0 6px 10px 4px rgba(60, 64, 67, 0.15);
+    --elevation-5: 0 4px 4px 0 rgba(60, 64, 67, 0.3), 0 8px 12px 6px rgba(60, 64, 67, 0.15);
+    
+    /* Border Radius */
+    --radius-xs: 4px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-full: 9999px;
+}
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap');
+
+/* Base Reset with Google Material Design */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-roboto);
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--text-primary);
+    background: var(--bg-canvas);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography - Google Material Design Scale */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-google-sans);
+    font-weight: 400;
+    color: var(--text-primary);
+}
+
+h1 {
+    font-size: 32px;
+    line-height: 40px;
+    letter-spacing: 0;
+    font-weight: 400;
+}
+
+h2 {
+    font-size: 24px;
+    line-height: 32px;
+    letter-spacing: 0;
+    font-weight: 400;
+}
+
+h3 {
+    font-size: 20px;
+    line-height: 28px;
+    letter-spacing: 0;
+    font-weight: 500;
+}
+
+h4 {
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: 0.1px;
+    font-weight: 500;
+}
+
+.headline-1 {
+    font-family: var(--font-google-sans);
+    font-size: 56px;
+    line-height: 64px;
+    font-weight: 400;
+}
+
+.headline-2 {
+    font-family: var(--font-google-sans);
+    font-size: 44px;
+    line-height: 52px;
+    font-weight: 400;
+}
+
+/* Navigation Bar - Google Cloud Style */
+.navbar {
+    background: var(--bg-white);
+    border-bottom: 1px solid var(--border-default);
+    box-shadow: none;
+    height: 64px;
+    display: flex;
+    align-items: center;
+}
+
+.navbar .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+}
+
+/* Logo - Google Style */
+.logo {
+    font-family: var(--font-google-sans);
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: none;
+    -webkit-text-fill-color: initial;
+    animation: none;
+}
+
+.logo::before {
+    content: '';
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    margin-right: var(--spacing-2);
+    background: linear-gradient(45deg, var(--google-blue), var(--google-green));
+    border-radius: var(--radius-xs);
+    vertical-align: middle;
+}
+
+.tagline {
+    display: none; /* Clean Google Cloud style */
+}
+
+/* Navigation Links - Material Design */
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-1);
+    height: 100%;
+}
+
+.nav-link {
+    padding: var(--spacing-2) var(--spacing-4);
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: var(--radius-xs);
+    transition: background-color 0.2s;
+    position: relative;
+    height: 36px;
+    display: flex;
+    align-items: center;
+}
+
+.nav-link:hover {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+}
+
+.nav-link:focus-visible {
+    outline: 2px solid var(--google-blue);
+    outline-offset: -2px;
+}
+
+/* Hero Section - Google Cloud Style */
+.hero {
+    background: var(--bg-white);
+    padding: var(--spacing-16) 0;
+    border-bottom: 1px solid var(--border-default);
+}
+
+.hero-title {
+    font-family: var(--font-google-sans);
+    font-size: 56px;
+    line-height: 64px;
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-4);
+}
+
+.hero-subtitle {
+    font-size: 18px;
+    line-height: 28px;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto var(--spacing-8);
+}
+
+/* Stats Cards - Material Design Cards */
+.hero-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-4);
+    margin: var(--spacing-10) auto;
+    max-width: 900px;
+}
+
+.stat {
+    background: var(--bg-white);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-6);
+    transition: box-shadow 0.3s;
+}
+
+.stat:hover {
+    box-shadow: var(--elevation-2);
+}
+
+.stat-value {
+    font-family: var(--font-google-sans);
+    font-size: 32px;
+    line-height: 40px;
+    color: var(--google-blue);
+    font-weight: 500;
+}
+
+.stat-label {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--text-secondary);
+    margin-top: var(--spacing-2);
+}
+
+/* Buttons - Material Design 3 */
+.btn {
+    font-family: var(--font-google-sans);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 0 var(--spacing-6);
+    height: 36px;
+    border-radius: var(--radius-full);
+    border: none;
+    cursor: pointer;
+    transition: box-shadow 0.2s, background-color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-primary {
+    background-color: var(--google-blue);
+    color: white;
+}
+
+.btn-primary:hover {
+    box-shadow: var(--elevation-2);
+    background-color: #1a73e8;
+}
+
+.btn-primary:active {
+    box-shadow: var(--elevation-1);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--google-blue);
+    border: 1px solid var(--border-default);
+}
+
+.btn-secondary:hover {
+    background-color: rgba(66, 133, 244, 0.04);
+}
+
+.btn-large {
+    height: 48px;
+    padding: 0 var(--spacing-8);
+    font-size: 15px;
+}
+
+/* Feature Cards - g3doc Style */
+.features {
+    padding: var(--spacing-16) 0;
+    background: var(--bg-canvas);
+}
+
+.features h2 {
+    text-align: center;
+    font-family: var(--font-google-sans);
+    font-size: 32px;
+    line-height: 40px;
+    margin-bottom: var(--spacing-12);
+    color: var(--text-primary);
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-6);
+}
+
+.feature-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-6);
+    transition: box-shadow 0.3s;
+}
+
+.feature-card:hover {
+    box-shadow: var(--elevation-2);
+}
+
+.feature-icon {
+    font-size: 24px;
+    color: var(--google-blue);
+    margin-bottom: var(--spacing-4);
+}
+
+.feature-card h3 {
+    font-family: var(--font-google-sans);
+    font-size: 18px;
+    line-height: 24px;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-3);
+}
+
+.feature-card p {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--text-secondary);
+}
+
+/* Code Blocks - g3doc Style */
+.code-block {
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin: var(--spacing-4) 0;
+}
+
+.code-header {
+    background: var(--bg-surface);
+    padding: var(--spacing-3) var(--spacing-4);
+    border-bottom: 1px solid var(--border-default);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.code-block pre {
+    margin: 0;
+    padding: var(--spacing-4);
+    background: var(--bg-white);
+    overflow-x: auto;
+}
+
+.code-block code {
+    font-family: var(--font-roboto-mono);
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--text-primary);
+}
+
+/* Copy Button - Material Design */
+.copy-btn {
+    background: var(--bg-white);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xs);
+    padding: var(--spacing-1) var(--spacing-3);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.copy-btn:hover {
+    background: var(--bg-surface);
+}
+
+/* Footer - Google Style */
+.footer {
+    background: var(--bg-white);
+    border-top: 1px solid var(--border-default);
+    padding: var(--spacing-8) 0;
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.footer-links {
+    margin-top: var(--spacing-3);
+}
+
+.footer-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    margin: 0 var(--spacing-3);
+    font-weight: 500;
+}
+
+.footer-links a:hover {
+    color: var(--google-blue);
+}
+
+.footer-contact {
+    margin-top: var(--spacing-3);
+    font-size: 12px;
+}
+
+.footer-contact a {
+    color: var(--google-blue);
+    text-decoration: none;
+}
+
+.footer-contact a:hover {
+    text-decoration: underline;
+}
+
+/* Material Design Ripple Effect */
+.ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.1);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.ripple:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* g3doc Style Documentation */
+.docs-section {
+    background: var(--bg-white);
+    padding: var(--spacing-8) 0;
+}
+
+.docs-sidebar {
+    background: var(--bg-surface);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-4);
+    position: sticky;
+    top: 80px;
+}
+
+.docs-nav h3 {
+    font-family: var(--font-google-sans);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-disabled);
+    margin: var(--spacing-6) 0 var(--spacing-3);
+}
+
+.docs-nav a {
+    display: block;
+    padding: var(--spacing-2) var(--spacing-3);
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 14px;
+    border-radius: var(--radius-xs);
+    transition: background-color 0.2s;
+}
+
+.docs-nav a:hover {
+    background: var(--bg-white);
+    color: var(--google-blue);
+}
+
+/* API Endpoint Cards */
+.api-endpoint {
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    margin: var(--spacing-4) 0;
+    overflow: hidden;
+}
+
+.endpoint-header {
+    background: var(--bg-surface);
+    padding: var(--spacing-3) var(--spacing-4);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.endpoint-header .method {
+    background: var(--google-green);
+    color: white;
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--radius-xs);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 32px;
+        line-height: 40px;
+    }
+    
+    .nav-menu {
+        flex-direction: column;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: var(--bg-white);
+        border-bottom: 1px solid var(--border-default);
+        display: none;
+    }
+    
+    .nav-menu.active {
+        display: flex;
+    }
+}
+
+/* Accessibility */
+*:focus-visible {
+    outline: 2px solid var(--google-blue);
+    outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .navbar,
+    .footer,
+    .hero-actions {
+        display: none;
+    }
+}

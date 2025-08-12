@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}500 - Server Error{% endblock %}
+
+{% block content %}
+<section class="error-page">
+    <div class="container">
+        <h1>500</h1>
+        <h2>Server Error</h2>
+        <p>Something went wrong on our end. Please try again later.</p>
+        <a href="/" class="btn btn-primary">Go Home</a>
+    </div>
+</section>
+
+<style>
+.error-page {
+    padding: 100px 0;
+    text-align: center;
+    min-height: 60vh;
+}
+
+.error-page h1 {
+    font-size: 120px;
+    color: var(--danger-color);
+    margin-bottom: 20px;
+}
+
+.error-page h2 {
+    font-size: 32px;
+    margin-bottom: 16px;
+}
+
+.error-page p {
+    font-size: 18px;
+    color: var(--gray);
+    margin-bottom: 32px;
+}
+</style>
+{% endblock %}

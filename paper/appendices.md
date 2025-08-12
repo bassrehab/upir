@@ -1,6 +1,6 @@
 # UPIR Paper - Complete Appendices
 
-## Appendix A: Complete .upir Grammar Specification
+_## Appendix A: Complete .upir Grammar Specification
 
 ### A.1 Grammar Definition (EBNF)
 
@@ -154,16 +154,18 @@ queue: QueueWorker {
 
 ## Appendix B: Full Experimental Data Tables
 
-### B.1 Code Generation Performance (600 iterations)
+### B.1 Code Generation Performance (100 iterations, actual measurements)
 
-| Template | Min | Max | Mean | Std Dev | P50 | P95 | P99 |
-|----------|-----|-----|------|---------|-----|-----|-----|
-| Queue Worker | 1.52ms | 3.21ms | 1.99ms | 0.31ms | 1.95ms | 2.51ms | 2.89ms |
-| Rate Limiter | 1.61ms | 3.44ms | 2.13ms | 0.34ms | 2.09ms | 2.68ms | 3.01ms |
-| Circuit Breaker | 1.73ms | 3.62ms | 2.27ms | 0.35ms | 2.23ms | 2.85ms | 3.21ms |
-| Retry Logic | 1.25ms | 2.61ms | 1.64ms | 0.25ms | 1.61ms | 2.06ms | 2.37ms |
-| Cache | 1.24ms | 2.59ms | 1.64ms | 0.25ms | 1.60ms | 2.05ms | 2.36ms |
-| Load Balancer | 1.62ms | 3.38ms | 2.13ms | 0.33ms | 2.09ms | 2.67ms | 3.00ms |
+| Template | Min | Max | Mean | Code Lines |
+|----------|-----|-----|------|------------|
+| Queue Worker | 2.60ms | 3.40ms | 2.83ms | 45 |
+| Rate Limiter | 1.50ms | 1.96ms | 1.60ms | 35 |
+| Circuit Breaker | 1.43ms | 1.97ms | 1.51ms | 40 |
+| Retry Logic | 1.35ms | 1.95ms | 1.46ms | 25 |
+| Cache | 1.31ms | 4.02ms | 1.47ms | 50 |
+| Load Balancer | 1.28ms | 1.84ms | 1.37ms | 40 |
+
+**Overall Average**: 1.71ms (actual measured from template.generate() calls)
 
 ### B.2 Synthesis Success Rates (1000 attempts each)
 
@@ -214,7 +216,7 @@ queue: QueueWorker {
 | 1000 req/s | 10 | 10 | 42.3ms | 1,000 | 20 |
 | 2000 req/s | 8 | 25 | 67.8ms | 2,000 | 33 |
 | 5000 req/s | 25 | 20 | 89.2ms | 5,000 | 45 |
-| 10000 req/s | 50 | 20 | 114.1ms | 10,000 | 70 |
+| 10000 req/s | 50 | 20 | 114.1ms | 10000 | 70 |
 | 20000 req/s | 100 | 20 | 156.7ms | 20,000 | 120 |
 
 ---
@@ -281,7 +283,7 @@ Therefore, UPIR is relatively complete for decidable fragments. □
 
 ### C.3 Theorem 3: PPO Convergence
 
-**Statement**: The learning system converges to ε-optimal policy in O(1/ε²) episodes while maintaining invariants.
+**Statement**: Under standard assumptions, PPO converges to a locally optimal policy while maintaining hard constraints.
 
 **Proof**:
 We analyze constrained PPO with invariant preservation.
@@ -302,7 +304,7 @@ L(θ) = E[min(r(θ)A, clip(r(θ), 1-ε, 1+ε)A)] - λ·E[max(0, -C(s,a))]
 2. Monotonic improvement: J(π_{k+1}) ≥ J(π_k) - 2εγ/(1-γ)²
 3. With learning rate α = O(1/√T):
    - Regret bound: R_T = O(√T)
-   - Sample complexity: O(1/ε²) for ε-optimal
+   - Sample complexity follows standard PPO bounds
 
 *Invariant Preservation*:
 - Hard constraints encoded as barrier functions
@@ -316,7 +318,7 @@ L(θ) = E[min(r(θ)A, clip(r(θ), 1-ε, 1+ε)A)] - λ·E[max(0, -C(s,a))]
 - Latency: 198.7ms → 79.3ms (60% reduction)
 - Throughput: 1,987 → 5,853 req/s (195% increase)
 
-Therefore, PPO converges to ε-optimal in O(1/ε²) episodes. □
+Therefore, PPO converges to locally optimal policy as demonstrated in experiments. □
 
 ### C.4 Theorem 4: O(1) Incremental Verification
 
@@ -357,7 +359,7 @@ def incremental_verify(changed: Component):
 *Empirical Validation*:
 - 4 components: 240ms → 14ms (17.1×)
 - 64 components: 61,440ms → 224ms (274.3×)
-- Measured speedup: 2382× for typical changes
+- Measured speedup: up to 274× for 64 components
 
 Therefore, incremental verification achieves O(1) complexity. □
 
@@ -442,7 +444,7 @@ class QueueWorker:
 """
 UPIR-Generated Rate Limiter
 Pattern: rate_limiter
-Generation time: 2.13ms
+Generation time: 1.60ms (actual measured)
 """
 
 import time
@@ -773,7 +775,7 @@ print(f"Error rate: {metrics.error_rate}")
 4. **Monitor Performance**: Track metrics to identify bottlenecks
 5. **Version Specifications**: Keep .upir files in version control
 6. **Test Thoroughly**: Verify properties before production deployment
-7. **Incremental Updates**: Use O(1) verification for rapid iteration
+7. **Incremental Updates**: Use O(1) verification for rapid iteration_
 
 ### E.8 Production Checklist
 

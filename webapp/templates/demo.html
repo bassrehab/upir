@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block title %}UPIR Demo - Interactive Code Generation{% endblock %}
+
+{% block content %}
+<section class="demo-section">
+    <div class="container">
+        <h1>Interactive UPIR Demo</h1>
+        <p class="lead">Try UPIR's code generation, verification, and synthesis capabilities</p>
+        
+        <div class="demo-grid">
+            <!-- Left Panel: Input -->
+            <div class="demo-panel">
+                <h2>1. Select Template</h2>
+                <div class="template-selector">
+                    {% for key, template in templates.items() %}
+                    <div class="template-option" data-template="{{ key }}">
+                        <input type="radio" name="template" value="{{ key }}" id="template-{{ key }}" 
+                               {% if loop.first %}checked{% endif %}>
+                        <label for="template-{{ key }}">
+                            <strong>{{ template.name }}</strong>
+                            <span class="generation-time">{{ template.generation_time }}ms</span>
+                            <small>{{ template.description }}</small>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <h2>2. Choose Language</h2>
+                <div class="language-selector">
+                    <button class="lang-btn active" data-lang="python">Python</button>
+                    <button class="lang-btn" data-lang="go">Go</button>
+                    <button class="lang-btn" data-lang="javascript">JavaScript</button>
+                </div>
+                
+                <h2>3. Constraints (Optional)</h2>
+                <textarea id="constraints" class="constraints-input" placeholder="Enter constraints in UPIR format:
+throughput >= 5000
+latency <= 100
+batch_size * workers >= throughput/10"></textarea>
+                
+                <div class="demo-actions">
+                    <button id="generate-btn" class="btn btn-primary">Generate Code</button>
+                    <button id="verify-btn" class="btn btn-secondary">Verify</button>
+                    <button id="synthesize-btn" class="btn btn-secondary">Synthesize Parameters</button>
+                </div>
+            </div>
+            
+            <!-- Right Panel: Output -->
+            <div class="demo-panel">
+                <h2>Generated Code</h2>
+                <div class="output-header">
+                    <span id="output-template">-</span>
+                    <span id="output-language">-</span>
+                    <span id="output-time">-</span>
+                </div>
+                <pre id="code-output" class="code-output"><code>// Generated code will appear here...</code></pre>
+                
+                <div id="verification-results" class="results-panel" style="display: none;">
+                    <h3>Verification Results</h3>
+                    <div id="verification-content"></div>
+                </div>
+                
+                <div id="synthesis-results" class="results-panel" style="display: none;">
+                    <h3>Synthesis Results</h3>
+                    <div id="synthesis-content"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sample UPIR Specification -->
+        <div class="sample-spec">
+            <h2>Sample .upir Specification</h2>
+            <pre><code>system PaymentProcessingPipeline {
+  components {
+    rate_limiter: RateLimiter {
+      pattern: "rate_limiter"
+      requirements {
+        requests_per_second: 1000
+        burst_size: 100
+      }
+      properties {
+        invariant: "token_count >= 0 && token_count <= burst_size"
+        guarantee: "rate <= requests_per_second"
+      }
+    }
+    
+    queue_worker: QueueWorker {
+      pattern: "queue_worker"
+      requirements {
+        batch_size: "${optimize}"  # Z3 will synthesize
+        workers: "${optimize}"      # Z3 will synthesize
+      }
+      constraints {
+        "batch_size * workers * 10 >= throughput"
+      }
+    }
+  }
+  
+  connections {
+    flow: rate_limiter -> queue_worker
+  }
+  
+  properties {
+    safety no_invalid_requests {
+      formula: "G(processed => validated)"
+    }
+    liveness all_processed {
+      formula: "G(received => F(processed))"
+    }
+  }
+}</code></pre>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let selectedTemplate = 'queue_worker';
+    let selectedLanguage = 'python';
+    
+    // Template selection
+    document.querySelectorAll('input[name="template"]').forEach(input => {
+        input.addEventListener('change', (e) => {
+            selectedTemplate = e.target.value;
+        });
+    });
+    
+    // Language selection
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            selectedLanguage = e.target.dataset.lang;
+        });
+    });
+    
+    // Generate code
+    document.getElementById('generate-btn').addEventListener('click', async () => {
+        const btn = document.getElementById('generate-btn');
+        btn.disabled = true;
+        btn.textContent = 'Generating...';
+        
+        try {
+            const response = await fetch('/api/generate', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    template: selectedTemplate,
+                    language: selectedLanguage
+                })
+            });
+            
+            const data = await response.json();
+            
+            document.getElementById('output-template').textContent = data.template;
+            document.getElementById('output-language').textContent = data.language;
+            document.getElementById('output-time').textContent = data.generation_time + 'ms';
+            document.getElementById('code-output').innerHTML = '<code>' + escapeHtml(data.code) + '</code>';
+            
+            // Syntax highlighting if available
+            if (typeof Prism !== 'undefined') {
+                Prism.highlightAll();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error generating code');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Generate Code';
+        }
+    });
+    
+    // Verify specification
+    document.getElementById('verify-btn').addEventListener('click', async () => {
+        const btn = document.getElementById('verify-btn');
+        btn.disabled = true;
+        btn.textContent = 'Verifying...';
+        
+        try {
+            const response = await fetch('/api/verify', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    specification: document.getElementById('constraints').value || 'system Test {}'
+                })
+            });
+            
+            const data = await response.json();
+            
+            const resultsDiv = document.getElementById('verification-results');
+            const contentDiv = document.getElementById('verification-content');
+            
+            contentDiv.innerHTML = `
+                <div class="result-item ${data.valid ? 'success' : 'error'}">
+                    <strong>Status:</strong> ${data.valid ? '✓ Valid' : '✗ Invalid'}
+                </div>
+                <div class="result-item">
+                    <strong>Verification Time:</strong> ${data.verification_time}ms
+                </div>
+                <div class="result-item">
+                    <strong>Properties Verified:</strong> ${data.properties_verified}
+                </div>
+                ${data.errors.length > 0 ? '<div class="result-item error"><strong>Errors:</strong><ul>' + 
+                    data.errors.map(e => '<li>' + e + '</li>').join('') + '</ul></div>' : ''}
+                ${data.warnings.length > 0 ? '<div class="result-item warning"><strong>Warnings:</strong><ul>' + 
+                    data.warnings.map(w => '<li>' + w + '</li>').join('') + '</ul></div>' : ''}
+            `;
+            
+            resultsDiv.style.display = 'block';
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error verifying specification');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Verify';
+        }
+    });
+    
+    // Synthesize parameters
+    document.getElementById('synthesize-btn').addEventListener('click', async () => {
+        const btn = document.getElementById('synthesize-btn');
+        btn.disabled = true;
+        btn.textContent = 'Synthesizing...';
+        
+        try {
+            const response = await fetch('/api/synthesize', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    constraints: document.getElementById('constraints').value
+                })
+            });
+            
+            const data = await response.json();
+            
+            const resultsDiv = document.getElementById('synthesis-results');
+            const contentDiv = document.getElementById('synthesis-content');
+            
+            contentDiv.innerHTML = `
+                <div class="result-item success">
+                    <strong>Status:</strong> ✓ Synthesis Complete
+                </div>
+                <div class="result-item">
+                    <strong>Synthesis Time:</strong> ${data.parameters.synthesis_time}ms
+                </div>
+                <div class="result-item">
+                    <strong>Solver:</strong> ${data.parameters.solver}
+                </div>
+                <div class="result-item">
+                    <strong>Optimized Parameters:</strong>
+                    <ul>
+                        <li>Batch Size: ${data.parameters.batch_size}</li>
+                        <li>Workers: ${data.parameters.workers}</li>
+                        <li>Throughput: ${data.parameters.throughput} req/s</li>
+                        <li>Resource Usage: ${data.parameters.resource_usage}</li>
+                    </ul>
+                </div>
+            `;
+            
+            resultsDiv.style.display = 'block';
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error synthesizing parameters');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Synthesize Parameters';
+        }
+    });
+    
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+});
+</script>
+{% endblock %}

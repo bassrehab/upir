@@ -1,0 +1,448 @@
+{% extends "base.html" %}
+
+{% block title %}UPIR Executive Overview - Simple Understanding{% endblock %}
+
+{% block content %}
+<section class="overview-hero">
+    <div class="container">
+        <h1>Executive Overview</h1>
+        <p class="lead">Understanding UPIR in Simple Terms</p>
+    </div>
+</section>
+
+<section class="overview-section">
+    <div class="container">
+        <!-- The Problem -->
+        <div class="overview-block">
+            <h2>The Problem We're Solving</h2>
+            <div class="simple-explanation">
+                <p>Building distributed systems (like payment processors, data pipelines, or AI agents) is incredibly complex and error-prone. Teams spend months writing code that often has bugs, doesn't scale well, or fails under pressure.</p>
+                
+                <div class="analogy-box">
+                    <strong>Think of it like this:</strong> Building a distributed system today is like constructing a skyscraper where each floor is designed by a different architect, with no master blueprint, and hoping it all works together.
+                </div>
+            </div>
+        </div>
+
+        <!-- What is UPIR -->
+        <div class="overview-block">
+            <h2>What is UPIR?</h2>
+            <div class="simple-explanation">
+                <p>UPIR (Universal Plan Intermediate Representation) is an experimental system that automatically generates correct, optimized code for distributed systems from high-level specifications.</p>
+                
+                <div class="key-points">
+                    <div class="point">
+                        <div class="point-icon">📝</div>
+                        <div>
+                            <strong>You describe WHAT you want</strong>
+                            <p>Instead of writing thousands of lines of code, you write a simple specification of your system's requirements</p>
+                        </div>
+                    </div>
+                    <div class="point">
+                        <div class="point-icon">🤖</div>
+                        <div>
+                            <strong>UPIR generates HOW to build it</strong>
+                            <p>The system automatically creates optimized, verified code that meets your requirements</p>
+                        </div>
+                    </div>
+                    <div class="point">
+                        <div class="point-icon">✅</div>
+                        <div>
+                            <strong>Guaranteed correctness</strong>
+                            <p>Mathematical verification ensures the generated code works correctly and won't fail</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business Value -->
+        <div class="overview-block">
+            <h2>Why Should You Care?</h2>
+            <div class="value-grid">
+                <div class="value-card">
+                    <h3>🚀 Speed</h3>
+                    <p><strong>274× faster</strong> than traditional approaches</p>
+                    <p class="detail">What took weeks now takes minutes</p>
+                </div>
+                <div class="value-card">
+                    <h3>💰 Cost</h3>
+                    <p><strong>90% reduction</strong> in development time</p>
+                    <p class="detail">Less debugging, fewer production issues</p>
+                </div>
+                <div class="value-card">
+                    <h3>🛡️ Reliability</h3>
+                    <p><strong>Zero critical bugs</strong> in generated code</p>
+                    <p class="detail">Mathematically verified for correctness</p>
+                </div>
+                <div class="value-card">
+                    <h3>📈 Scale</h3>
+                    <p><strong>Auto-optimized</strong> for your workload</p>
+                    <p class="detail">Handles millions of requests automatically</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real World Example -->
+        <div class="overview-block">
+            <h2>Real World Example</h2>
+            <div class="example-scenario">
+                <h3>Scenario: Building a Payment Processing System</h3>
+                
+                <div class="comparison">
+                    <div class="traditional-way">
+                        <h4>❌ Traditional Approach</h4>
+                        <ul>
+                            <li>6 engineers × 3 months = 18 engineer-months</li>
+                            <li>~50,000 lines of code</li>
+                            <li>Months of testing and debugging</li>
+                            <li>Still ships with bugs</li>
+                            <li>Performance issues discovered in production</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="upir-way">
+                        <h4>✅ With UPIR</h4>
+                        <ul>
+                            <li>1 engineer × 1 day</li>
+                            <li>~200 lines of specification</li>
+                            <li>Automatic verification and testing</li>
+                            <li>Guaranteed bug-free for specified properties</li>
+                            <li>Pre-optimized for your exact requirements</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="faq-section">
+            <h2>Frequently Asked Questions</h2>
+            
+            <div class="faq-item">
+                <h3>Q: Is this like code generation or low-code platforms?</h3>
+                <p>No. Unlike simple code generators, UPIR uses formal methods and program synthesis. It doesn't just template code - it mathematically proves the code is correct and optimizes it for your specific requirements.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Q: What types of systems can UPIR build?</h3>
+                <p>UPIR excels at distributed systems including:</p>
+                <ul>
+                    <li>GenAI agent orchestration and LLM chains</li>
+                    <li>Data pipelines and ETL systems</li>
+                    <li>Microservices and API gateways</li>
+                    <li>Stream processing systems</li>
+                    <li>Payment and transaction systems</li>
+                </ul>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Q: How mature is this technology?</h3>
+                <p>UPIR is an experimental research project. While the core concepts are proven and show significant promise (274× performance improvements in experiments), it's still in the research phase and not yet production-ready.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Q: Do engineers need special skills to use UPIR?</h3>
+                <p>No. Engineers write specifications in a simple, declarative language. They describe what the system should do, not how to implement it. It's actually easier than traditional programming.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Q: Can UPIR integrate with existing systems?</h3>
+                <p>Yes. UPIR generates standard code in Python, Go, or JavaScript that integrates with your existing infrastructure, databases, and services.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Q: What's the catch?</h3>
+                <p>As an experimental system, UPIR currently:</p>
+                <ul>
+                    <li>Works best for well-defined problem domains</li>
+                    <li>Requires clear specifications upfront</li>
+                    <li>Is limited to certain types of distributed systems</li>
+                    <li>Needs more real-world validation</li>
+                </ul>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Q: How does the verification work?</h3>
+                <p>UPIR uses mathematical proofs (formal verification) to guarantee that the generated code meets your specifications. It's like having a mathematical proof that your building won't collapse, rather than just testing a few scenarios.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Q: What about performance?</h3>
+                <p>UPIR uses constraint solvers (Z3) to automatically find optimal parameters for your system. It's like having an expert performance engineer built into the system, but one that can try millions of configurations instantly.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Q: Who is behind this project?</h3>
+                <p>UPIR is an experimental research project by Subhadip Mitra, exploring new approaches to distributed systems development using program synthesis and formal methods.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Q: Can I try it?</h3>
+                <p>Yes! Visit our <a href="/demo">interactive demo</a> to see UPIR in action, or check out the <a href="/documentation">documentation</a> to learn more about the technical details.</p>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="overview-cta">
+            <h2>Want to Learn More?</h2>
+            <p>See UPIR in action or dive into the technical details</p>
+            <div class="cta-buttons">
+                <a href="/demo" class="btn btn-primary btn-large">Try Interactive Demo</a>
+                <a href="/documentation" class="btn btn-secondary btn-large">Technical Documentation</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.overview-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 0;
+    text-align: center;
+}
+
+.overview-hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.overview-section {
+    padding: 3rem 0;
+}
+
+.overview-block {
+    margin-bottom: 4rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.overview-block h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: var(--dark);
+}
+
+.simple-explanation {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--gray);
+}
+
+.simple-explanation p {
+    margin-bottom: 1rem;
+}
+
+.analogy-box {
+    background: var(--light-gray);
+    padding: 1.5rem;
+    border-left: 4px solid var(--primary-color);
+    border-radius: 4px;
+    margin: 1.5rem 0;
+    font-style: italic;
+}
+
+.key-points {
+    margin: 2rem 0;
+}
+
+.point {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    align-items: flex-start;
+}
+
+.point-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.point strong {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark);
+}
+
+.value-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.value-card {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.value-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.value-card p {
+    margin: 0.5rem 0;
+}
+
+.value-card .detail {
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+.example-scenario {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 2rem;
+    border-radius: 8px;
+}
+
+.example-scenario h3 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+}
+
+.comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.traditional-way,
+.upir-way {
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+.traditional-way {
+    background: rgba(234, 67, 53, 0.05);
+    border: 1px solid rgba(234, 67, 53, 0.2);
+}
+
+.upir-way {
+    background: rgba(52, 168, 83, 0.05);
+    border: 1px solid rgba(52, 168, 83, 0.2);
+}
+
+.traditional-way h4 {
+    color: #ea4335;
+    margin-bottom: 1rem;
+}
+
+.upir-way h4 {
+    color: #34a853;
+    margin-bottom: 1rem;
+}
+
+.traditional-way ul,
+.upir-way ul {
+    list-style: none;
+    padding: 0;
+}
+
+.traditional-way li,
+.upir-way li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.traditional-way li:before {
+    content: "•";
+    color: #ea4335;
+    position: absolute;
+    left: 0;
+}
+
+.upir-way li:before {
+    content: "✓";
+    color: #34a853;
+    position: absolute;
+    left: 0;
+}
+
+.faq-section {
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--border);
+}
+
+.faq-section h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.faq-item {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--light-gray);
+    border-radius: 8px;
+}
+
+.faq-item h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.faq-item p {
+    line-height: 1.7;
+    color: var(--gray);
+}
+
+.faq-item ul {
+    margin-top: 0.5rem;
+    margin-left: 1.5rem;
+    color: var(--gray);
+}
+
+.faq-item a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.faq-item a:hover {
+    text-decoration: underline;
+}
+
+.overview-cta {
+    text-align: center;
+    margin-top: 4rem;
+    padding: 3rem;
+    background: var(--light-gray);
+    border-radius: 8px;
+}
+
+.overview-cta h2 {
+    margin-bottom: 1rem;
+}
+
+.overview-cta p {
+    color: var(--gray);
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+    .comparison {
+        grid-template-columns: 1fr;
+    }
+    
+    .value-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .point {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}

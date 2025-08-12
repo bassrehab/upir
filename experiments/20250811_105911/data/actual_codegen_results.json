@@ -1,0 +1,43 @@
+{
+  "experiment": "actual_code_generation_timing",
+  "iterations": 100,
+  "results": {
+    "queue_worker": {
+      "average_ms": 2.829886249091942,
+      "min_ms": 2.6009579887613654,
+      "max_ms": 3.403457987587899,
+      "code_lines": 0
+    },
+    "rate_limiter": {
+      "average_ms": 1.603149100265,
+      "min_ms": 1.501083024777472,
+      "max_ms": 1.9613330077845603,
+      "code_lines": 0
+    },
+    "circuit_breaker": {
+      "average_ms": 1.5147837315453216,
+      "min_ms": 1.4339160115923733,
+      "max_ms": 1.9701670098584145,
+      "code_lines": 0
+    },
+    "retry": {
+      "average_ms": 1.4624787803040817,
+      "min_ms": 1.3498749758582562,
+      "max_ms": 1.9489589903969318,
+      "code_lines": 0
+    },
+    "cache": {
+      "average_ms": 1.4657808205811307,
+      "min_ms": 1.3064999948255718,
+      "max_ms": 4.017707979073748,
+      "code_lines": 0
+    },
+    "load_balancer": {
+      "average_ms": 1.3743229693500325,
+      "min_ms": 1.2810839980375022,
+      "max_ms": 1.8432500073686242,
+      "code_lines": 0
+    }
+  },
+  "average_ms": 1.7084002751895848
+}

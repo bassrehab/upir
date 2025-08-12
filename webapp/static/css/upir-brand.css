@@ -1,0 +1,448 @@
+/* UPIR Unique Brand Styling */
+
+:root {
+    /* UPIR Brand Colors - Inspired by circuit boards and data flow */
+    --upir-primary: #6366f1;      /* Electric Indigo */
+    --upir-secondary: #8b5cf6;    /* Vivid Purple */
+    --upir-accent: #ec4899;       /* Magenta Pink */
+    --upir-success: #10b981;      /* Emerald */
+    --upir-warning: #f59e0b;      /* Amber */
+    --upir-danger: #ef4444;       /* Red */
+    
+    /* Gradient Combinations */
+    --upir-gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+    --upir-gradient-2: linear-gradient(45deg, #6366f1 0%, #10b981 100%);
+    --upir-gradient-3: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+    
+    /* Dark Theme Colors */
+    --upir-dark: #0f172a;
+    --upir-dark-lighter: #1e293b;
+    --upir-dark-border: #334155;
+    
+    /* Light Theme Colors */
+    --upir-light: #f8fafc;
+    --upir-light-gray: #e2e8f0;
+    --upir-text-primary: #0f172a;
+    --upir-text-secondary: #64748b;
+    
+    /* Typography */
+    --upir-font: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
+    --upir-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Import unique fonts */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* Override base styles with UPIR branding */
+body {
+    font-family: var(--upir-font);
+    background: var(--upir-light);
+    position: relative;
+}
+
+/* Animated background pattern */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(236, 72, 153, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* UPIR Logo Animation */
+.logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: var(--upir-gradient-1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    letter-spacing: -0.02em;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+.logo::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--upir-gradient-1);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.nav-brand:hover .logo::after {
+    transform: scaleX(1);
+}
+
+/* Enhanced Navigation */
+.navbar {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+}
+
+.nav-link {
+    position: relative;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    width: 100%;
+    height: 2px;
+    background: var(--upir-gradient-1);
+    transition: transform 0.3s ease;
+}
+
+.nav-link:hover {
+    color: var(--upir-primary);
+}
+
+.nav-link:hover::after {
+    transform: translateX(-50%) scaleX(1);
+}
+
+/* Glassmorphism Hero */
+.hero {
+    background: var(--upir-gradient-1);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(255, 255, 255, 0.03) 10px,
+        rgba(255, 255, 255, 0.03) 20px
+    );
+    animation: slide 20s linear infinite;
+}
+
+@keyframes slide {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+.hero-title {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: fadeInUp 0.8s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Glassmorphism Stats Cards */
+.stat {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.stat:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.stat-value {
+    font-family: var(--upir-font-mono);
+    font-weight: 600;
+    background: linear-gradient(45deg, #fff, rgba(255, 255, 255, 0.8));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Neumorphic Feature Cards */
+.feature-card {
+    background: var(--upir-light);
+    box-shadow: 
+        8px 8px 16px rgba(0, 0, 0, 0.08),
+        -8px -8px 16px rgba(255, 255, 255, 0.9);
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--upir-gradient-1);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover::before {
+    transform: scaleX(1);
+}
+
+.feature-card:hover {
+    box-shadow: 
+        12px 12px 24px rgba(0, 0, 0, 0.1),
+        -12px -12px 24px rgba(255, 255, 255, 1);
+}
+
+.feature-icon {
+    background: var(--upir-gradient-1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Enhanced Buttons */
+.btn {
+    font-family: var(--upir-font);
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+    z-index: -1;
+}
+
+.btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-primary {
+    background: var(--upir-gradient-1);
+    border: none;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+/* Code Blocks with Syntax Highlighting Theme */
+.code-output,
+pre code {
+    background: var(--upir-dark);
+    color: #e2e8f0;
+    font-family: var(--upir-font-mono);
+    border: 1px solid var(--upir-dark-border);
+}
+
+.output-header {
+    background: var(--upir-dark-lighter);
+    color: var(--upir-light);
+    border-bottom: 1px solid var(--upir-dark-border);
+}
+
+/* Animated Workflow */
+.workflow-step {
+    animation: fadeIn 0.6s ease forwards;
+    opacity: 0;
+}
+
+.workflow-step:nth-child(1) { animation-delay: 0.2s; }
+.workflow-step:nth-child(2) { animation-delay: 0.4s; }
+.workflow-step:nth-child(3) { animation-delay: 0.6s; }
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+.step-number {
+    background: var(--upir-gradient-1);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+    transition: transform 0.3s;
+}
+
+.workflow-step:hover .step-number {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Footer with gradient border */
+.footer {
+    background: var(--upir-dark);
+    position: relative;
+}
+
+.footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--upir-gradient-1);
+}
+
+.footer-contact {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+.footer-contact a {
+    color: var(--upir-accent);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-contact a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* Loading Animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(99, 102, 241, 0.2);
+    border-radius: 50%;
+    border-top-color: var(--upir-primary);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Interactive Demo Enhancements */
+.template-option input[type="radio"]:checked + label {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05));
+    border-color: var(--upir-primary);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+}
+
+.lang-btn.active {
+    background: var(--upir-gradient-1);
+    color: white;
+    border: none;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.generation-time {
+    color: var(--upir-success);
+    font-family: var(--upir-font-mono);
+}
+
+/* Results Panel */
+.results-panel {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.02));
+    border: 1px solid var(--upir-light-gray);
+}
+
+.result-item.success {
+    color: var(--upir-success);
+}
+
+.result-item.error {
+    color: var(--upir-danger);
+}
+
+.result-item.warning {
+    color: var(--upir-warning);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .stat {
+        backdrop-filter: blur(10px);
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--upir-light);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--upir-gradient-1);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--upir-primary);
+}
+
+/* Accessibility Focus Styles */
+*:focus-visible {
+    outline: 2px solid var(--upir-primary);
+    outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+    .navbar,
+    .footer,
+    .hero-actions {
+        display: none;
+    }
+    
+    .hero {
+        background: none;
+        color: black;
+    }
+}

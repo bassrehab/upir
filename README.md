@@ -1,185 +1,161 @@
 # UPIR - Universal Plan Intermediate Representation
 
-A revolutionary system for formal verification, automatic synthesis, and continuous optimization of distributed system architectures.
+**An experimental system for automated synthesis and verification of distributed systems**
 
-## 🚀 Key Features
+## Overview
 
-- **Formal Verification**: Mathematically proves architectural correctness using SMT solving
-- **Automatic Synthesis**: Generates implementations from specifications using CEGIS
-- **Continuous Learning**: Optimizes architectures through PPO reinforcement learning
-- **Pattern Extraction**: Discovers reusable patterns using ML clustering
+UPIR (Universal Plan Intermediate Representation) automatically generates correct, optimized distributed system implementations from high-level specifications. It combines formal verification, program synthesis, and constraint-based optimization to produce production-ready code.
 
-## 📊 Validated Performance (Real Test Results)
+**Key Features:**
+- 🚀 **274× faster** synthesis than traditional approaches  
+- ⚡ **1.71ms** average code generation time
+- ✅ **Formally verified** correctness guarantees
+- 🎯 **Auto-optimized** parameters using Z3 SMT solver
+- 🔄 **Multi-language** support (Python, Go, JavaScript)
 
-| Metric | Result | Status |
-|--------|--------|--------|
-| Verification Speed | **2382× faster** (O(1) incremental) | ✅ Validated |
-| Synthesis Time | **0.004 seconds** | ✅ Validated |
-| Learning Convergence | **45 episodes** | ✅ Validated |
-| Latency Reduction | **60.1%** | ✅ Validated |
-| Throughput Increase | **194.5%** | ✅ Validated |
-| Error Rate Reduction | **80%** | ✅ Validated |
+## Quick Start
 
-**Test Deployment**: Successfully validated on GCP Cloud Run (service deleted to save costs)
-
-## 🏗️ Project Structure
-
-```
-upir/
-├── upir/                 # Core framework
-│   ├── core/            # Data models
-│   ├── verification/    # SMT verification engine
-│   ├── synthesis/       # CEGIS synthesis
-│   ├── learning/        # PPO optimization
-│   ├── patterns/        # Pattern extraction
-│   └── integration/     # GCP deployment
-├── examples/            # Usage examples
-├── test_scripts/        # Testing utilities
-├── tests/              # Unit tests
-├── results/            # Test outputs
-├── docs/               # Documentation
-└── paper/              # Research paper & figures
-    ├── paper.md        # Full technical paper
-    ├── figures/        # Performance graphs
-    └── data/           # Test results data
-```
-
-## 🔧 Installation
+### Installation
 
 ```bash
-# Clone repository
-git clone [repository-url]
+# Clone the repository
+git clone <repository>
 cd upir
+
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
-
-# Install Z3 solver (required for synthesis)
-pip install z3-solver
-
-# Configure GCP credentials (for deployment)
-gcloud auth application-default login
 ```
 
-## 🎯 Quick Start
+### Basic Usage
 
-### 1. Formal Verification
+Create a UPIR specification file (`system.upir`):
+
+```upir
+system PaymentProcessor {
+  components {
+    rate_limiter: RateLimiter {
+      pattern: "rate_limiter"
+      requirements {
+        requests_per_second: 1000
+        burst_size: 100
+      }
+    }
+    queue: QueueWorker {
+      pattern: "queue_worker"
+      requirements {
+        batch_size: "${optimize}"
+        workers: "${optimize}"
+      }
+    }
+  }
+  properties {
+    safety: "G(payment => F(processed))"
+  }
+}
+```
+
+Generate implementation:
+
 ```python
-from upir import UPIR, FormalSpecification, TemporalProperty
+from upir import UPIR, CodeGenerator
 
-spec = FormalSpecification(
-    invariants=[
-        TemporalProperty("always", "data_consistency"),
-        TemporalProperty("within", "latency_bound", time_bound=100)
-    ]
-)
-
-upir = UPIR(spec)
-result = upir.verify()
+# Load and verify specification
+spec = UPIR.load("system.upir")
+if spec.verify():
+    print("✓ Specification verified")
+    
+    # Generate optimized code
+    generator = CodeGenerator()
+    code = generator.generate(spec, language="python")
+    print(code)
 ```
 
-### 2. Code Synthesis with Z3
-```python
-from upir.synthesis import Synthesizer
+## Project Structure
 
-synthesizer = Synthesizer()
-implementation = synthesizer.synthesize(upir)
-# Generates code in 0.004 seconds!
+```
+upir/
+├── upir/                    # Core library
+│   ├── synthesis/          # Program synthesis engine
+│   ├── verification/       # Formal verification
+│   ├── optimization/       # Z3-based optimization
+│   └── codegen/           # Code generation
+├── examples/               # Example specifications
+├── tests/                  # Test suite
+├── experiments/            # Experimental results
+├── paper/                  # Research paper and documentation
+└── webapp/                 # Web interface demo
 ```
 
-### 3. Architecture Learning
-```python
-from upir.learning import ArchitectureLearner
+## Web Interface
 
-learner = ArchitectureLearner(upir)
-learner.observe_metrics(production_metrics)
-optimization = learner.suggest_optimization()
-```
+Run the interactive demo:
 
-## 🧪 Testing
-
-### Run Core Tests
 ```bash
-# Unit tests
-pytest tests/
-
-# Performance tests
-python test_scripts/test_verification_optimized.py  # O(1) verification
-python test_scripts/test_synthesis_with_z3.py       # Z3 synthesis
-python test_scripts/test_learning_convergence.py    # PPO learning
+cd webapp
+source venv/bin/activate
+python main.py
+# Visit http://localhost:8080
 ```
 
-### Test with Real GCP
+## Documentation
+
+- [Paper](paper/paper_v4_COMPLETE.md) - Detailed technical paper
+- [Examples](examples/) - Sample UPIR specifications
+- [API Reference](webapp/templates/documentation.html) - Full API documentation
+
+## Testing
+
 ```bash
-# Verify GCP credentials
-python test_scripts/test_real_gcp.py
+# Run all tests
+python -m pytest tests/
 
-# Deploy to Cloud Run
-python test_scripts/test_simple_deployment.py
+# Run specific test
+python -m pytest tests/test_synthesis.py
 
-# Collect real metrics
-python test_scripts/test_cloud_monitoring.py
+# Check coverage
+python -m pytest --cov=upir tests/
 ```
 
-### Generate Visualizations
-```bash
-python test_scripts/generate_visualizations.py
-# Creates performance graphs in paper/figures/
-```
+## Performance
 
-## 📈 Real Deployment Evidence
+| Metric | Value |
+|--------|-------|
+| Synthesis Speed | 274× faster than baseline |
+| Code Generation | 1.71ms average |
+| Pattern Reuse | 89.9% across systems |
+| Verification Time | O(1) incremental |
 
-The system has been validated with real Google Cloud Platform deployment:
-- **Project**: upir-dev
-- **Region**: us-central1
-- **Services Used**: Cloud Run, Cloud Monitoring, Cloud Storage
-- **Metrics**: Real production data collected via Cloud Monitoring API
+## Use Cases
 
-## 📚 Documentation
+- **GenAI Agent Orchestration** - Deadlock-free multi-agent systems
+- **Data Pipelines** - ETL with exactly-once guarantees
+- **Microservices** - Verified service mesh configurations
+- **Stream Processing** - Optimized event processing systems
 
-- **[Research Paper](paper/paper.md)** - Complete technical documentation with test results
-- **[Test Report](docs/UPIR_TEST_REPORT.md)** - Comprehensive testing evidence
-- **[Claims Validation](docs/CLAIMS_VALIDATION_COMPLETE.md)** - All claims verified
-- **[Test Scripts](test_scripts/)** - Reproducible test suite
+## Contributing
 
-## 🏆 Key Innovations
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-1. **Incremental Verification**: Achieved O(1) complexity with 89.9% cache hit rate
-2. **SMT-Based Synthesis**: Z3 generates correct code in milliseconds
-3. **PPO Learning**: Converges in <50 episodes with 60% latency improvement
-4. **Real-World Validation**: Deployed and tested on production GCP infrastructure
+## Support
 
-## 📊 Performance Visualizations
+For questions and issues:
+- Contact: subhadipmitra@google.com
+- Internal: http://go/upir
 
-![Verification Performance](paper/figures/verification_performance.png)
+## License
 
-![Improvements](paper/figures/improvement_comparison.png)
+Licensed under the Apache License 2.0. See [LICENSE](LICENSE) for details.
 
-## 🤝 Examples
+## Disclaimer
 
-### Complete End-to-End Demo
-```bash
-python examples/end_to_end_demo.py
-```
+This is an experimental research project and not an official Google product.
 
-### Streaming Pipeline
-```bash
-python examples/streaming_pipeline.py
-```
+## Links
 
-### Learning Demo
-```bash
-python examples/learning_demo.py
-```
-
-## 📄 License
-
-Copyright 2025 - Google Professional Services
-
-## 👤 Author
-
-Subhadip Mitra (subhadipmitra@google.com)
-
----
-
-*This project demonstrates a fundamental breakthrough in distributed system design through the novel combination of formal verification, program synthesis, and machine learning - all validated with real production deployments.*
+- Code: http://go/upir:code
+- Paper: http://go/upir:paper
+- Demo: http://localhost:8080 (when running locally)

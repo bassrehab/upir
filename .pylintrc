@@ -1,0 +1,51 @@
+# Google Python Style Guide configuration for pylint
+# Based on https://google.github.io/styleguide/pyguide.html
+
+[MASTER]
+# Add files or directories to ignore
+ignore=venv,env,.git,__pycache__,webapp/venv
+
+[MESSAGES CONTROL]
+# Disable messages that conflict with Google style
+disable=
+    too-few-public-methods,
+    too-many-arguments,
+    too-many-locals,
+    too-many-instance-attributes,
+    fixme
+
+[FORMAT]
+# Maximum line length (Google style: 80)
+max-line-length=80
+
+# Allow longer lines in docstrings and comments
+max-docstring-length=72
+
+# Expected indentation
+indent-string='    '
+
+[BASIC]
+# Naming conventions following Google style
+function-rgx=[a-z_][a-z0-9_]{2,30}$
+variable-rgx=[a-z_][a-z0-9_]{2,30}$
+const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__))$
+class-rgx=[A-Z_][a-zA-Z0-9]+$
+method-rgx=[a-z_][a-z0-9_]{2,30}$
+module-rgx=(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
+
+[TYPECHECK]
+# Handle dynamic members
+generated-members=
+
+[DESIGN]
+# Reasonable defaults for Google style
+max-args=5
+max-attributes=7
+max-bool-expr=5
+max-branches=12
+max-locals=15
+max-parents=7
+max-public-methods=20
+max-returns=6
+max-statements=50
+min-public-methods=0

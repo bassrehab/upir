@@ -103,9 +103,9 @@ python main.py
 
 ## Documentation
 
-- [Paper](paper/paper_v4_COMPLETE.md) - Detailed technical paper
 - [Examples](examples/) - Sample UPIR specifications
-- [API Reference](webapp/templates/documentation.html) - Full API documentation
+- [Web Interface](webapp/) - Interactive demo and API documentation
+- [Experiment Report](experiments/20250811_105911/EXPERIMENT_REPORT.md) - Performance validation
 
 ## Testing
 

@@ -38,3 +38,10 @@ scipy>=1.10.0
 # Optional: For visualization
 matplotlib>=3.7.0
 seaborn>=0.12.0
+
+
+
+# for webapp
+Flask==2.3.3
+gunicorn==21.2.0
+Werkzeug==2.3.7

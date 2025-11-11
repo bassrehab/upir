@@ -13,6 +13,8 @@ Author: Subhadip Mitra
 License: Apache 2.0
 """
 
+import hashlib
+import json
 from dataclasses import dataclass, field
 from typing import Any, Dict, List
 
@@ -83,6 +85,32 @@ class Architecture:
             "deployment": self.deployment.copy(),
             "patterns": self.patterns.copy()
         }
+
+    def hash(self) -> str:
+        """
+        Generate SHA-256 hash of this architecture.
+
+        Uses deterministic JSON serialization to ensure same architecture
+        always produces the same hash, enabling caching and integrity checks.
+
+        Returns:
+            Hexadecimal SHA-256 hash string
+
+        Example:
+            >>> arch = Architecture(components=[{"id": "c1"}])
+            >>> hash1 = arch.hash()
+            >>> hash2 = arch.hash()
+            >>> hash1 == hash2  # Deterministic
+            True
+
+        References:
+        - SHA-256: Industry standard cryptographic hash
+        - Python hashlib: https://docs.python.org/3/library/hashlib.html
+        """
+        arch_dict = self.to_dict()
+        json_str = json.dumps(arch_dict, sort_keys=True)
+        hash_obj = hashlib.sha256(json_str.encode('utf-8'))
+        return hash_obj.hexdigest()
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "Architecture":

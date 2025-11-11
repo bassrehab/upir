@@ -15,6 +15,8 @@ Author: Subhadip Mitra
 License: Apache 2.0
 """
 
+import hashlib
+import json
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, Optional
@@ -164,6 +166,35 @@ class TemporalProperty:
             "time_bound": self.time_bound,
             "parameters": self.parameters.copy()
         }
+
+    def hash(self) -> str:
+        """
+        Generate SHA-256 hash of this temporal property.
+
+        Uses deterministic JSON serialization to ensure same property
+        always produces the same hash, enabling caching and integrity checks.
+
+        Returns:
+            Hexadecimal SHA-256 hash string
+
+        Example:
+            >>> prop = TemporalProperty(
+            ...     operator=TemporalOperator.ALWAYS,
+            ...     predicate="test"
+            ... )
+            >>> hash1 = prop.hash()
+            >>> hash2 = prop.hash()
+            >>> hash1 == hash2  # Deterministic
+            True
+
+        References:
+        - SHA-256: Industry standard cryptographic hash
+        - Python hashlib: https://docs.python.org/3/library/hashlib.html
+        """
+        prop_dict = self.to_dict()
+        json_str = json.dumps(prop_dict, sort_keys=True)
+        hash_obj = hashlib.sha256(json_str.encode('utf-8'))
+        return hash_obj.hexdigest()
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "TemporalProperty":

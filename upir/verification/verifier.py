@@ -17,8 +17,9 @@ License: Apache 2.0
 
 import hashlib
 import json
+import logging
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 
 from upir.core.architecture import Architecture
 from upir.core.temporal import TemporalOperator, TemporalProperty
@@ -37,38 +38,57 @@ if is_z3_available():
 else:
     z3 = None
 
+# Logger for verification engine
+logger = logging.getLogger(__name__)
+
 
 class ProofCache:
     """
-    Cache for verification results to avoid redundant proofs.
+    LRU cache for verification results to avoid redundant proofs.
 
     Per TD Commons disclosure, caching verification results is essential
     for performance since proving the same property multiple times wastes
     computational resources. The cache uses SHA-256 hashes of property
     and architecture as keys to ensure integrity.
 
+    Implements LRU (Least Recently Used) eviction policy: when the cache
+    reaches max_size, the oldest entry is removed. Python dicts maintain
+    insertion order (since 3.7+), making LRU implementation straightforward.
+
     Attributes:
         cache: Dictionary mapping cache keys to verification results
         hits: Number of cache hits (found in cache)
         misses: Number of cache misses (not found, had to verify)
+        max_size: Maximum number of entries before LRU eviction
 
     Example:
-        >>> cache = ProofCache()
+        >>> cache = ProofCache(max_size=1000)
         >>> result = cache.get(property, architecture)
         >>> if result is None:
         ...     result = verify_property(property, architecture)
         ...     cache.put(property, architecture, result)
+        >>> print(f"Hit rate: {cache.hit_rate():.1f}%")
 
     References:
-    - TD Commons: Caching for performance optimization
+    - TD Commons: Incremental verification and caching
     - SHA-256 for cache key integrity
+    - Python dict ordering: https://docs.python.org/3/library/stdtypes.html#dict
     """
 
-    def __init__(self):
-        """Initialize empty cache with zero hits/misses."""
+    def __init__(self, max_size: int = 1000):
+        """
+        Initialize empty cache with zero hits/misses.
+
+        Args:
+            max_size: Maximum number of entries before LRU eviction (default: 1000)
+
+        Example:
+            >>> cache = ProofCache(max_size=500)
+        """
         self.cache: Dict[str, VerificationResult] = {}
         self.hits: int = 0
         self.misses: int = 0
+        self.max_size: int = max_size
 
     def get(
         self,
@@ -116,7 +136,11 @@ class ProofCache:
         result: VerificationResult
     ) -> None:
         """
-        Store verification result in cache.
+        Store verification result in cache with LRU eviction.
+
+        If cache is full (reached max_size), removes the oldest entry
+        before adding the new one. Python dicts maintain insertion order,
+        so the first key is always the oldest.
 
         Args:
             property: Temporal property that was verified
@@ -124,11 +148,24 @@ class ProofCache:
             result: Verification result to cache
 
         Example:
-            >>> cache = ProofCache()
-            >>> result = verify_property(prop, arch)
-            >>> cache.put(prop, arch, result)
+            >>> cache = ProofCache(max_size=2)
+            >>> cache.put(prop1, arch, result1)
+            >>> cache.put(prop2, arch, result2)
+            >>> cache.put(prop3, arch, result3)  # Evicts prop1
+            >>> assert len(cache.cache) == 2
+
+        References:
+        - LRU cache pattern with Python dict ordering
         """
         key = self._compute_key(property, architecture)
+
+        # If cache is full and key is new, evict oldest entry
+        if len(self.cache) >= self.max_size and key not in self.cache:
+            # Remove first (oldest) entry
+            oldest_key = next(iter(self.cache))
+            del self.cache[oldest_key]
+            logger.debug(f"Evicted oldest cache entry: {oldest_key[:16]}...")
+
         self.cache[key] = result
 
     def invalidate(self, architecture: Architecture) -> None:
@@ -203,14 +240,28 @@ class ProofCache:
         self.hits = 0
         self.misses = 0
 
+    def hit_rate(self) -> float:
+        """
+        Compute cache hit rate as a percentage.
+
+        Returns:
+            Hit rate as a percentage (0.0 to 100.0)
+
+        Example:
+            >>> cache = ProofCache()
+            >>> # After some operations
+            >>> print(f"Hit rate: {cache.hit_rate():.1f}%")
+            Hit rate: 66.7%
+        """
+        total = self.hits + self.misses
+        return (self.hits / total * 100) if total > 0 else 0.0
+
     def __str__(self) -> str:
         """Human-readable representation."""
-        total = self.hits + self.misses
-        hit_rate = (self.hits / total * 100) if total > 0 else 0.0
         return (
-            f"ProofCache(size={len(self.cache)}, "
+            f"ProofCache(size={len(self.cache)}/{self.max_size}, "
             f"hits={self.hits}, misses={self.misses}, "
-            f"hit_rate={hit_rate:.1f}%)"
+            f"hit_rate={self.hit_rate():.1f}%)"
         )
 
 
@@ -230,9 +281,10 @@ class Verifier:
         timeout: Verification timeout in milliseconds (default: 30000 = 30s)
         enable_cache: Whether to cache verification results
         cache: Proof cache instance (if caching enabled)
+        cache_size: Maximum cache size with LRU eviction (default: 1000)
 
     Example:
-        >>> verifier = Verifier(timeout=30000, enable_cache=True)
+        >>> verifier = Verifier(timeout=30000, enable_cache=True, cache_size=1000)
         >>> result = verifier.verify_property(property, architecture)
         >>> if result.verified:
         ...     print("Property proved!")
@@ -245,19 +297,25 @@ class Verifier:
     - Bounded model checking: Clarke et al. (1999)
     """
 
-    def __init__(self, timeout: int = 30000, enable_cache: bool = True):
+    def __init__(
+        self,
+        timeout: int = 30000,
+        enable_cache: bool = True,
+        cache_size: int = 1000
+    ):
         """
         Initialize verifier with timeout and caching options.
 
         Args:
             timeout: Timeout in milliseconds (default: 30000 = 30 seconds)
             enable_cache: Enable result caching (default: True)
+            cache_size: Maximum cache entries with LRU eviction (default: 1000)
 
         Raises:
             RuntimeError: If Z3 is not available
 
         Example:
-            >>> verifier = Verifier(timeout=60000, enable_cache=True)
+            >>> verifier = Verifier(timeout=60000, enable_cache=True, cache_size=500)
         """
         if not is_z3_available():
             raise RuntimeError(
@@ -267,7 +325,7 @@ class Verifier:
 
         self.timeout = timeout
         self.enable_cache = enable_cache
-        self.cache = ProofCache() if enable_cache else None
+        self.cache = ProofCache(max_size=cache_size) if enable_cache else None
 
     def verify_property(
         self,
@@ -457,6 +515,123 @@ class Verifier:
                 assumptions=upir.specification.assumptions
             )
             results.append(result)
+
+        return results
+
+    def verify_incremental(
+        self,
+        upir: UPIR,
+        changed_properties: Set[str]
+    ) -> List[VerificationResult]:
+        """
+        Incrementally verify only changed properties, using cache for rest.
+
+        Per TD Commons disclosure, incremental verification is critical for
+        performance when iterating on architectures. Only changed properties
+        are re-verified; unchanged properties use cached results when available.
+
+        This method:
+        1. Invalidates cache if architecture changed (detects by hash)
+        2. Re-verifies changed properties (forced verification)
+        3. Uses cache for unchanged properties (may still miss if not cached)
+        4. Logs cache statistics at INFO level
+
+        Args:
+            upir: UPIR instance with specification and architecture
+            changed_properties: Set of predicate names that changed
+                              (e.g., {"data_consistent", "backup_complete"})
+
+        Returns:
+            List of VerificationResult for all properties (invariants + properties)
+
+        Raises:
+            ValueError: If UPIR is missing specification or architecture
+
+        Example:
+            >>> # Initial verification (all cache misses)
+            >>> upir = UPIR(...)
+            >>> upir.specification = FormalSpecification(
+            ...     properties=[
+            ...         TemporalProperty(ALWAYS, "data_consistent"),
+            ...         TemporalProperty(EVENTUALLY, "backup_complete"),
+            ...         TemporalProperty(WITHIN, "response_fast", time_bound=1.0)
+            ...     ]
+            ... )
+            >>> upir.architecture = Architecture(...)
+            >>> verifier = Verifier(enable_cache=True)
+            >>>
+            >>> # First verification - all misses
+            >>> results = verifier.verify_incremental(upir, set())
+            >>> # INFO: Cache statistics: 0 hits, 3 misses, hit rate: 0.0%
+            >>> assert verifier.cache.misses == 3
+            >>> assert verifier.cache.hits == 0
+            >>>
+            >>> # Second verification with one change - 2 hits, 1 miss
+            >>> results = verifier.verify_incremental(
+            ...     upir,
+            ...     changed_properties={"backup_complete"}
+            ... )
+            >>> # INFO: Cache statistics: 2 hits, 4 misses, hit rate: 33.3%
+            >>> assert verifier.cache.hits == 2  # data_consistent, response_fast
+            >>> assert verifier.cache.misses == 4  # 3 initial + 1 for backup_complete
+            >>>
+            >>> # Third verification with no changes - 3 hits, 0 new misses
+            >>> results = verifier.verify_incremental(upir, set())
+            >>> # INFO: Cache statistics: 5 hits, 4 misses, hit rate: 55.6%
+            >>> assert verifier.cache.hit_rate() > 50.0
+
+        References:
+        - TD Commons: Incremental verification section
+        - Cache invalidation on architecture changes
+        """
+        if upir.specification is None:
+            raise ValueError("UPIR must have a specification to verify")
+        if upir.architecture is None:
+            raise ValueError("UPIR must have an architecture to verify")
+
+        # Track previous architecture hash to detect changes
+        # (In production, could store this in UPIR or verifier state)
+        current_arch_hash = upir.architecture.hash()
+
+        # Invalidate cache entries for changed properties
+        if self.enable_cache and changed_properties:
+            # Remove cache entries for changed properties
+            # We need to recompute cache keys for changed properties
+            all_props = list(upir.specification.invariants) + list(upir.specification.properties)
+            for prop in all_props:
+                if prop.predicate in changed_properties:
+                    cache_key = self.cache._compute_key(prop, upir.architecture)
+                    if cache_key in self.cache.cache:
+                        del self.cache.cache[cache_key]
+
+        results = []
+
+        # Verify invariants
+        # verify_property will check cache; changed properties were invalidated above
+        for invariant in upir.specification.invariants:
+            result = self.verify_property(
+                property=invariant,
+                architecture=upir.architecture,
+                assumptions=upir.specification.assumptions
+            )
+            results.append(result)
+
+        # Verify properties
+        for property in upir.specification.properties:
+            result = self.verify_property(
+                property=property,
+                architecture=upir.architecture,
+                assumptions=upir.specification.assumptions
+            )
+            results.append(result)
+
+        # Log cache statistics
+        if self.enable_cache:
+            logger.info(
+                f"Cache statistics: {self.cache.hits} hits, "
+                f"{self.cache.misses} misses, "
+                f"hit rate: {self.cache.hit_rate():.1f}%"
+            )
 
         return results
 

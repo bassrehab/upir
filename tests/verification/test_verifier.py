@@ -2,8 +2,9 @@
 Unit tests for main verification engine using Z3.
 
 Tests verify:
-- ProofCache: get, put, invalidate, key computation, statistics
+- ProofCache: get, put, invalidate, key computation, statistics, LRU eviction
 - Verifier: property verification, specification verification, caching
+- Incremental verification: changed properties, cache hits, statistics
 - SMT encoding: architecture and property encoding
 - Error handling: timeouts, errors, missing Z3
 
@@ -11,6 +12,7 @@ Author: Subhadip Mitra
 License: Apache 2.0
 """
 
+import logging
 import pytest
 from upir.core.architecture import Architecture
 from upir.core.specification import FormalSpecification
@@ -18,6 +20,12 @@ from upir.core.temporal import TemporalOperator, TemporalProperty
 from upir.core.upir import UPIR
 from upir.verification.solver import VerificationStatus, is_z3_available
 from upir.verification.verifier import ProofCache, Verifier
+
+# Shortcuts for TemporalOperator
+ALWAYS = TemporalOperator.ALWAYS
+EVENTUALLY = TemporalOperator.EVENTUALLY
+WITHIN = TemporalOperator.WITHIN
+UNTIL = TemporalOperator.UNTIL
 
 
 class TestProofCache:
@@ -531,6 +539,351 @@ class TestVerifierWithoutZ3:
 
         with pytest.raises(RuntimeError, match="Z3 solver is not available"):
             Verifier()
+
+
+class TestProofCacheLRU:
+    """Tests for LRU eviction in ProofCache."""
+
+    def test_cache_with_max_size(self):
+        """Test creating cache with max_size."""
+        cache = ProofCache(max_size=10)
+        assert cache.max_size == 10
+        assert len(cache.cache) == 0
+
+    def test_lru_eviction_when_full(self):
+        """Test that oldest entry is evicted when cache is full."""
+        cache = ProofCache(max_size=2)
+        arch = Architecture(components=[{"id": "c1"}])
+
+        prop1 = TemporalProperty(ALWAYS, "prop1")
+        prop2 = TemporalProperty(ALWAYS, "prop2")
+        prop3 = TemporalProperty(ALWAYS, "prop3")
+
+        from upir.verification.solver import VerificationResult
+        result = VerificationResult(
+            property=prop1,
+            status=VerificationStatus.PROVED
+        )
+
+        # Add two entries - cache is full
+        cache.put(prop1, arch, result)
+        cache.put(prop2, arch, result)
+        assert len(cache.cache) == 2
+
+        # Add third entry - should evict prop1 (oldest)
+        cache.put(prop3, arch, result)
+        assert len(cache.cache) == 2
+
+        # prop1 should be evicted, prop2 and prop3 should remain
+        assert cache.get(prop1, arch) is None  # miss
+        assert cache.get(prop2, arch) is not None  # hit
+        assert cache.get(prop3, arch) is not None  # hit
+
+    def test_lru_no_eviction_when_not_full(self):
+        """Test no eviction when cache is not full."""
+        cache = ProofCache(max_size=10)
+        arch = Architecture(components=[{"id": "c1"}])
+
+        props = [TemporalProperty(ALWAYS, f"prop{i}") for i in range(5)]
+
+        from upir.verification.solver import VerificationResult
+        result = VerificationResult(
+            property=props[0],
+            status=VerificationStatus.PROVED
+        )
+
+        for prop in props:
+            cache.put(prop, arch, result)
+
+        # All 5 should still be in cache
+        assert len(cache.cache) == 5
+        for prop in props:
+            assert cache.get(prop, arch) is not None
+
+    def test_lru_updating_existing_key_no_eviction(self):
+        """Test updating existing key doesn't trigger eviction."""
+        cache = ProofCache(max_size=2)
+        arch = Architecture(components=[{"id": "c1"}])
+
+        prop1 = TemporalProperty(ALWAYS, "prop1")
+        prop2 = TemporalProperty(ALWAYS, "prop2")
+
+        from upir.verification.solver import VerificationResult
+        result1 = VerificationResult(
+            property=prop1,
+            status=VerificationStatus.PROVED
+        )
+        result2 = VerificationResult(
+            property=prop2,
+            status=VerificationStatus.DISPROVED
+        )
+
+        # Add two entries - cache is full
+        cache.put(prop1, arch, result1)
+        cache.put(prop2, arch, result2)
+        assert len(cache.cache) == 2
+
+        # Update prop1 with new result - no eviction
+        cache.put(prop1, arch, result2)
+        assert len(cache.cache) == 2
+
+        # Both should still be in cache
+        assert cache.get(prop1, arch) is not None
+        assert cache.get(prop2, arch) is not None
+
+    def test_hit_rate_method(self):
+        """Test hit_rate() calculation."""
+        cache = ProofCache()
+        assert cache.hit_rate() == 0.0  # No operations yet
+
+        arch = Architecture(components=[{"id": "c1"}])
+        prop = TemporalProperty(ALWAYS, "test")
+
+        # One miss
+        cache.get(prop, arch)
+        assert cache.hit_rate() == 0.0  # 0/1 = 0%
+
+        # Add to cache
+        from upir.verification.solver import VerificationResult
+        result = VerificationResult(
+            property=prop,
+            status=VerificationStatus.PROVED
+        )
+        cache.put(prop, arch, result)
+
+        # Two hits
+        cache.get(prop, arch)
+        cache.get(prop, arch)
+        # 2 hits, 1 miss = 2/3 = 66.7%
+        assert abs(cache.hit_rate() - 66.7) < 0.1
+
+    def test_cache_str_with_max_size(self):
+        """Test string representation includes max_size."""
+        cache = ProofCache(max_size=500)
+        s = str(cache)
+        assert "size=0/500" in s
+
+
+@pytest.mark.skipif(not is_z3_available(), reason="Z3 not installed")
+class TestIncrementalVerification:
+    """Tests for incremental verification."""
+
+    def test_verify_incremental_no_changes(self):
+        """Test incremental verification with no changes uses cache."""
+        verifier = Verifier(timeout=5000, enable_cache=True)
+
+        spec = FormalSpecification(
+            properties=[
+                TemporalProperty(ALWAYS, "data_consistent"),
+                TemporalProperty(EVENTUALLY, "backup_complete")
+            ]
+        )
+        arch = Architecture(components=[{"id": "server"}])
+        upir = UPIR(
+            id="test",
+            name="Test",
+            description="Test",
+            specification=spec,
+            architecture=arch
+        )
+
+        # First verification - all misses
+        results1 = verifier.verify_incremental(upir, set())
+        assert len(results1) == 2
+        assert verifier.cache.misses == 2
+        assert verifier.cache.hits == 0
+
+        # Second verification with no changes - all hits
+        results2 = verifier.verify_incremental(upir, set())
+        assert len(results2) == 2
+        assert verifier.cache.hits == 2
+        assert verifier.cache.misses == 2  # Still 2 from first run
+
+    def test_verify_incremental_with_changes(self):
+        """Test incremental verification reverifies changed properties."""
+        verifier = Verifier(timeout=5000, enable_cache=True)
+
+        spec = FormalSpecification(
+            properties=[
+                TemporalProperty(ALWAYS, "data_consistent"),
+                TemporalProperty(EVENTUALLY, "backup_complete"),
+                TemporalProperty(WITHIN, "response_fast", time_bound=1.0)
+            ]
+        )
+        arch = Architecture(components=[{"id": "server"}])
+        upir = UPIR(
+            id="test",
+            name="Test",
+            description="Test",
+            specification=spec,
+            architecture=arch
+        )
+
+        # First verification - all misses
+        results1 = verifier.verify_incremental(upir, set())
+        assert verifier.cache.misses == 3
+        assert verifier.cache.hits == 0
+
+        # Second verification with one change - 2 hits, 1 new miss
+        results2 = verifier.verify_incremental(
+            upir,
+            changed_properties={"backup_complete"}
+        )
+        assert len(results2) == 3
+        assert verifier.cache.hits == 2  # data_consistent, response_fast
+        assert verifier.cache.misses == 4  # 3 initial + 1 for backup_complete
+
+    def test_verify_incremental_with_invariants(self):
+        """Test incremental verification handles invariants and properties."""
+        verifier = Verifier(timeout=5000, enable_cache=True)
+
+        spec = FormalSpecification(
+            invariants=[
+                TemporalProperty(ALWAYS, "data_valid")
+            ],
+            properties=[
+                TemporalProperty(EVENTUALLY, "task_complete")
+            ]
+        )
+        arch = Architecture(components=[{"id": "worker"}])
+        upir = UPIR(
+            id="test",
+            name="Test",
+            description="Test",
+            specification=spec,
+            architecture=arch
+        )
+
+        # First verification
+        results1 = verifier.verify_incremental(upir, set())
+        assert len(results1) == 2  # 1 invariant + 1 property
+        assert verifier.cache.misses == 2
+
+        # Change only the property (not invariant)
+        results2 = verifier.verify_incremental(
+            upir,
+            changed_properties={"task_complete"}
+        )
+        assert verifier.cache.hits == 1  # data_valid (invariant)
+        assert verifier.cache.misses == 3  # 2 initial + 1 for task_complete
+
+    def test_verify_incremental_missing_specification(self):
+        """Test error when UPIR has no specification."""
+        verifier = Verifier(timeout=5000, enable_cache=True)
+        upir = UPIR(id="test", name="Test", description="Test")
+
+        with pytest.raises(ValueError, match="must have a specification"):
+            verifier.verify_incremental(upir, set())
+
+    def test_verify_incremental_missing_architecture(self):
+        """Test error when UPIR has no architecture."""
+        verifier = Verifier(timeout=5000, enable_cache=True)
+        spec = FormalSpecification()
+        upir = UPIR(
+            id="test",
+            name="Test",
+            description="Test",
+            specification=spec
+        )
+
+        with pytest.raises(ValueError, match="must have an architecture"):
+            verifier.verify_incremental(upir, set())
+
+    def test_verify_incremental_cache_statistics_logged(self, caplog):
+        """Test that cache statistics are logged at INFO level."""
+        verifier = Verifier(timeout=5000, enable_cache=True)
+
+        spec = FormalSpecification(
+            properties=[TemporalProperty(ALWAYS, "test")]
+        )
+        arch = Architecture(components=[{"id": "c1"}])
+        upir = UPIR(
+            id="test",
+            name="Test",
+            description="Test",
+            specification=spec,
+            architecture=arch
+        )
+
+        with caplog.at_level(logging.INFO, logger="upir.verification.verifier"):
+            verifier.verify_incremental(upir, set())
+
+        # Check that cache statistics were logged
+        assert any("Cache statistics" in record.message for record in caplog.records)
+        assert any("hits" in record.message for record in caplog.records)
+        assert any("misses" in record.message for record in caplog.records)
+
+    def test_verify_incremental_disabled_cache(self):
+        """Test incremental verification without cache."""
+        verifier = Verifier(timeout=5000, enable_cache=False)
+
+        spec = FormalSpecification(
+            properties=[
+                TemporalProperty(ALWAYS, "test1"),
+                TemporalProperty(ALWAYS, "test2")
+            ]
+        )
+        arch = Architecture(components=[{"id": "c1"}])
+        upir = UPIR(
+            id="test",
+            name="Test",
+            description="Test",
+            specification=spec,
+            architecture=arch
+        )
+
+        # Should work without cache, but always verify
+        results = verifier.verify_incremental(upir, set())
+        assert len(results) == 2
+
+    def test_verify_incremental_hit_rate_improves(self):
+        """Test that hit rate improves with repeated verifications."""
+        verifier = Verifier(timeout=5000, enable_cache=True)
+
+        spec = FormalSpecification(
+            properties=[
+                TemporalProperty(ALWAYS, "p1"),
+                TemporalProperty(ALWAYS, "p2"),
+                TemporalProperty(ALWAYS, "p3")
+            ]
+        )
+        arch = Architecture(components=[{"id": "c1"}])
+        upir = UPIR(
+            id="test",
+            name="Test",
+            description="Test",
+            specification=spec,
+            architecture=arch
+        )
+
+        # First run - 0% hit rate
+        verifier.verify_incremental(upir, set())
+        assert verifier.cache.hit_rate() == 0.0
+
+        # Second run - 100% hit rate (no changes)
+        verifier.verify_incremental(upir, set())
+        assert verifier.cache.hit_rate() == 50.0  # 3 hits, 3 misses
+
+        # Third run - even higher hit rate
+        verifier.verify_incremental(upir, set())
+        hit_rate = verifier.cache.hit_rate()
+        assert hit_rate > 60.0  # 6 hits, 3 misses = 66.7%
+
+
+class TestVerifierCacheSize:
+    """Tests for Verifier cache_size parameter."""
+
+    @pytest.mark.skipif(not is_z3_available(), reason="Z3 not installed")
+    def test_verifier_with_custom_cache_size(self):
+        """Test creating verifier with custom cache size."""
+        verifier = Verifier(timeout=5000, enable_cache=True, cache_size=100)
+        assert verifier.cache.max_size == 100
+
+    @pytest.mark.skipif(not is_z3_available(), reason="Z3 not installed")
+    def test_verifier_default_cache_size(self):
+        """Test verifier uses default cache size of 1000."""
+        verifier = Verifier(timeout=5000, enable_cache=True)
+        assert verifier.cache.max_size == 1000
 
 
 class TestEdgeCases:

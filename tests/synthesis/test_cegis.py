@@ -477,6 +477,256 @@ class TestSynthesizerWithoutZ3:
             Synthesizer()
 
 
+@pytest.mark.skipif(not is_z3_available(), reason="Z3 not installed")
+class TestPatternInference:
+    """Tests for pattern-specific sketch generation."""
+
+    def test_infer_streaming_from_keywords(self):
+        """Test streaming inference from keywords."""
+        spec = FormalSpecification(
+            properties=[
+                TemporalProperty(
+                    operator=TemporalOperator.ALWAYS,
+                    predicate="process_stream_events"
+                )
+            ]
+        )
+        synth = Synthesizer()
+        system_type = synth._infer_system_type(spec)
+        assert system_type == "streaming"
+
+    def test_infer_streaming_from_latency(self):
+        """Test streaming inference from low latency requirement."""
+        spec = FormalSpecification(
+            properties=[
+                TemporalProperty(
+                    operator=TemporalOperator.WITHIN,
+                    predicate="respond",
+                    time_bound=500  # 500ms - very low latency
+                )
+            ]
+        )
+        synth = Synthesizer()
+        system_type = synth._infer_system_type(spec)
+        assert system_type == "streaming"
+
+    def test_infer_batch_from_keywords(self):
+        """Test batch inference from keywords."""
+        spec = FormalSpecification(
+            properties=[
+                TemporalProperty(
+                    operator=TemporalOperator.ALWAYS,
+                    predicate="batch_job_completes"
+                )
+            ]
+        )
+        synth = Synthesizer()
+        system_type = synth._infer_system_type(spec)
+        assert system_type == "batch"
+
+    def test_infer_api_from_keywords(self):
+        """Test API inference from keywords."""
+        spec = FormalSpecification(
+            properties=[
+                TemporalProperty(
+                    operator=TemporalOperator.ALWAYS,
+                    predicate="api_request_handled"
+                )
+            ]
+        )
+        synth = Synthesizer()
+        system_type = synth._infer_system_type(spec)
+        assert system_type == "api"
+
+    def test_infer_generic_default(self):
+        """Test generic inference as default."""
+        spec = FormalSpecification(
+            properties=[
+                TemporalProperty(
+                    operator=TemporalOperator.ALWAYS,
+                    predicate="something_unknown"
+                )
+            ]
+        )
+        synth = Synthesizer()
+        system_type = synth._infer_system_type(spec)
+        assert system_type == "generic"
+
+    def test_generate_streaming_sketch(self):
+        """Test streaming sketch generation."""
+        spec = FormalSpecification(
+            properties=[
+                TemporalProperty(
+                    operator=TemporalOperator.ALWAYS,
+                    predicate="stream_processing"
+                )
+            ]
+        )
+        synth = Synthesizer()
+        sketch = synth.generate_sketch(spec)
+
+        # Should generate streaming sketch
+        assert isinstance(sketch, ProgramSketch)
+        assert "apache_beam" in sketch.template.lower()
+        assert "streaming" in sketch.template.lower()
+
+        # Should have 3 holes: window_size, parallelism, buffer_size
+        assert len(sketch.holes) == 3
+        hole_names = {h.name for h in sketch.holes}
+        assert "window_size" in hole_names
+        assert "parallelism" in hole_names
+        assert "buffer_size" in hole_names
+
+        # Check constraints
+        for hole in sketch.holes:
+            if hole.name == "window_size":
+                assert hole.hole_type == "value"
+                assert len(hole.constraints) > 0
+                # Should have range constraint 1-3600
+                assert any(c[0] == "range" and c[1] == 1 and c[2] == 3600
+                          for c in hole.constraints if isinstance(c, tuple))
+            elif hole.name == "parallelism":
+                assert hole.hole_type == "value"
+                # Should have range constraint 1-100
+                assert any(c[0] == "range" and c[1] == 1 and c[2] == 100
+                          for c in hole.constraints if isinstance(c, tuple))
+            elif hole.name == "buffer_size":
+                assert hole.hole_type == "value"
+                # Should have range constraint 100-10000
+                assert any(c[0] == "range" and c[1] == 100 and c[2] == 10000
+                          for c in hole.constraints if isinstance(c, tuple))
+
+    def test_generate_batch_sketch(self):
+        """Test batch sketch generation."""
+        spec = FormalSpecification(
+            properties=[
+                TemporalProperty(
+                    operator=TemporalOperator.ALWAYS,
+                    predicate="batch_processing"
+                )
+            ]
+        )
+        synth = Synthesizer()
+        sketch = synth.generate_sketch(spec)
+
+        # Should generate batch sketch
+        assert isinstance(sketch, ProgramSketch)
+        assert "apache_beam" in sketch.template.lower()
+
+        # Should have 2 holes: batch_size, parallelism
+        assert len(sketch.holes) == 2
+        hole_names = {h.name for h in sketch.holes}
+        assert "batch_size" in hole_names
+        assert "parallelism" in hole_names
+
+        # Check constraints
+        for hole in sketch.holes:
+            if hole.name == "batch_size":
+                assert hole.hole_type == "value"
+                # Should have range constraint 100-10000
+                assert any(c[0] == "range" and c[1] == 100 and c[2] == 10000
+                          for c in hole.constraints if isinstance(c, tuple))
+            elif hole.name == "parallelism":
+                assert hole.hole_type == "value"
+                # Should have range constraint 1-50
+                assert any(c[0] == "range" and c[1] == 1 and c[2] == 50
+                          for c in hole.constraints if isinstance(c, tuple))
+
+    def test_generate_api_sketch(self):
+        """Test API sketch generation."""
+        spec = FormalSpecification(
+            properties=[
+                TemporalProperty(
+                    operator=TemporalOperator.ALWAYS,
+                    predicate="api_endpoint_available"
+                )
+            ]
+        )
+        synth = Synthesizer()
+        sketch = synth.generate_sketch(spec)
+
+        # Should generate API sketch
+        assert isinstance(sketch, ProgramSketch)
+        assert "fastapi" in sketch.template.lower() or "api" in sketch.template.lower()
+
+        # Should have 2 holes: max_connections, timeout
+        assert len(sketch.holes) == 2
+        hole_names = {h.name for h in sketch.holes}
+        assert "max_connections" in hole_names
+        assert "timeout" in hole_names
+
+        # Check constraints
+        for hole in sketch.holes:
+            if hole.name == "max_connections":
+                assert hole.hole_type == "value"
+                # Should have range constraint 10-1000
+                assert any(c[0] == "range" and c[1] == 10 and c[2] == 1000
+                          for c in hole.constraints if isinstance(c, tuple))
+            elif hole.name == "timeout":
+                assert hole.hole_type == "value"
+                # Should have range constraint 100-30000
+                assert any(c[0] == "range" and c[1] == 100 and c[2] == 30000
+                          for c in hole.constraints if isinstance(c, tuple))
+
+    def test_generate_generic_sketch(self):
+        """Test generic sketch generation."""
+        spec = FormalSpecification(
+            properties=[
+                TemporalProperty(
+                    operator=TemporalOperator.ALWAYS,
+                    predicate="custom_requirement"
+                )
+            ]
+        )
+        synth = Synthesizer()
+        sketch = synth.generate_sketch(spec)
+
+        # Should generate generic sketch
+        assert isinstance(sketch, ProgramSketch)
+        assert "def synthesized_function" in sketch.template
+
+        # Should have 2 holes: param1, param2
+        assert len(sketch.holes) == 2
+        hole_names = {h.name for h in sketch.holes}
+        assert "param1" in hole_names
+        assert "param2" in hole_names
+
+        # Check constraints
+        for hole in sketch.holes:
+            assert hole.hole_type == "value"
+            # Should have range constraint 0-100
+            assert any(c[0] == "range" and c[1] == 0 and c[2] == 100
+                      for c in hole.constraints if isinstance(c, tuple))
+
+    def test_streaming_with_pubsub_keyword(self):
+        """Test streaming inference with 'pubsub' keyword."""
+        spec = FormalSpecification(
+            properties=[
+                TemporalProperty(
+                    operator=TemporalOperator.ALWAYS,
+                    predicate="pubsub_messages_delivered"
+                )
+            ]
+        )
+        synth = Synthesizer()
+        system_type = synth._infer_system_type(spec)
+        assert system_type == "streaming"
+
+    def test_batch_with_etl_keyword(self):
+        """Test batch inference with 'etl' keyword."""
+        spec = FormalSpecification(
+            invariants=[
+                TemporalProperty(
+                    operator=TemporalOperator.ALWAYS,
+                    predicate="etl_pipeline_completes"
+                )
+            ]
+        )
+        synth = Synthesizer()
+        system_type = synth._infer_system_type(spec)
+        assert system_type == "batch"
+
+
 class TestEdgeCases:
     """Tests for edge cases and special scenarios."""
 

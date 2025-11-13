@@ -368,9 +368,8 @@ class Synthesizer:
         Generate initial program sketch from specification.
 
         Creates a program template with holes based on the formal
-        specification. This is a simplified implementation - full
-        version would analyze specification to generate appropriate
-        sketch structure.
+        specification. Analyzes the spec to infer system type (streaming,
+        batch, api, generic) and generates appropriate pattern-specific sketch.
 
         Args:
             spec: Formal specification
@@ -379,25 +378,416 @@ class Synthesizer:
             ProgramSketch with holes to fill
 
         Example:
-            >>> spec = FormalSpecification(...)
+            >>> spec = FormalSpecification(
+            ...     properties=[
+            ...         TemporalProperty(WITHIN, "event_processed", time_bound=100)
+            ...     ]
+            ... )
             >>> sketch = synthesizer.generate_sketch(spec)
-            >>> len(sketch.holes) > 0
-            True
+            >>> sketch.framework  # Will be "Apache Beam" for streaming
+            'Apache Beam'
 
         References:
         - CEGIS: Sketch generation from specifications
         - TD Commons: Specification-to-sketch translation
+        - Apache Beam: Streaming pattern
         """
-        # Simplified sketch generation
-        # In full implementation, would analyze spec to create appropriate sketch
+        # Infer system type from specification
+        system_type = self._infer_system_type(spec)
+        logger.info(f"Inferred system type: {system_type}")
 
-        # For now, create a simple sketch with a few value holes
+        # Generate pattern-specific sketch
+        if system_type == "streaming":
+            return self._generate_streaming_sketch(spec)
+        elif system_type == "batch":
+            return self._generate_batch_sketch(spec)
+        elif system_type == "api":
+            return self._generate_api_sketch(spec)
+        else:
+            return self._generate_generic_sketch(spec)
+
+    def _infer_system_type(self, spec: FormalSpecification) -> str:
+        """
+        Infer distributed system type from specification.
+
+        Analyzes predicates, time bounds, and constraints to determine
+        the type of system being specified: streaming, batch, API, or generic.
+
+        Heuristics:
+        - "stream" or "event" in predicates -> streaming
+        - Low latency bounds (<1000ms) -> streaming
+        - "batch" in constraints or predicates -> batch
+        - "request" or "response" in predicates -> api
+        - Default: generic
+
+        Args:
+            spec: Formal specification to analyze
+
+        Returns:
+            System type: "streaming", "batch", "api", or "generic"
+
+        Example:
+            >>> spec = FormalSpecification(
+            ...     properties=[
+            ...         TemporalProperty(WITHIN, "event_processed", time_bound=500)
+            ...     ]
+            ... )
+            >>> synth._infer_system_type(spec)
+            'streaming'
+
+        References:
+        - TD Commons: Pattern inference from specifications
+        - Distributed system patterns
+        """
+        # Collect all predicates from properties and invariants
+        predicates = []
+        time_bounds = []
+
+        for prop in spec.properties + spec.invariants:
+            predicates.append(prop.predicate.lower())
+            if prop.time_bound is not None:
+                time_bounds.append(prop.time_bound)
+
+        # Check for streaming indicators
+        streaming_keywords = ["stream", "event", "message", "pubsub", "kafka"]
+        for keyword in streaming_keywords:
+            for predicate in predicates:
+                if keyword in predicate:
+                    return "streaming"
+
+        # Check for low latency (< 1 second) indicating streaming
+        if time_bounds:
+            min_bound = min(time_bounds)
+            if min_bound < 1000:  # Less than 1 second (in ms)
+                return "streaming"
+
+        # Check for batch indicators
+        batch_keywords = ["batch", "job", "task", "etl"]
+        for keyword in batch_keywords:
+            for predicate in predicates:
+                if keyword in predicate:
+                    return "batch"
+
+        # Check for API indicators
+        api_keywords = ["request", "response", "endpoint", "api", "http"]
+        for keyword in api_keywords:
+            for predicate in predicates:
+                if keyword in predicate:
+                    return "api"
+
+        # Default to generic
+        return "generic"
+
+    def _generate_streaming_sketch(self, spec: FormalSpecification) -> ProgramSketch:
+        """
+        Generate Apache Beam streaming pipeline sketch.
+
+        Creates a streaming data pipeline template with holes for:
+        - window_size: Window duration in seconds (1-3600)
+        - parallelism: Max number of workers (1-100)
+        - buffer_size: Buffer size for processing (100-10000)
+
+        Args:
+            spec: Formal specification
+
+        Returns:
+            ProgramSketch for Apache Beam streaming pipeline
+
+        Example:
+            >>> spec = FormalSpecification(...)
+            >>> sketch = synth._generate_streaming_sketch(spec)
+            >>> sketch.framework
+            'Apache Beam'
+            >>> len(sketch.holes)
+            3
+
+        References:
+        - Apache Beam: https://beam.apache.org/
+        - TD Commons: Streaming pattern synthesis
+        """
+        template = '''import apache_beam as beam
+from apache_beam.options.pipeline_options import PipelineOptions
+
+def create_pipeline():
+    """
+    Streaming data pipeline.
+
+    Synthesized configuration:
+    - Window size: __HOLE_window_size__ seconds
+    - Max workers: __HOLE_parallelism__
+    - Buffer size: __HOLE_buffer_size__
+    """
+    options = PipelineOptions(
+        streaming=True,
+        max_num_workers=__HOLE_parallelism__
+    )
+
+    with beam.Pipeline(options=options) as pipeline:
+        # Read from streaming source
+        events = (
+            pipeline
+            | 'Read Events' >> beam.io.ReadFromPubSub(
+                subscription='projects/PROJECT/subscriptions/SUBSCRIPTION'
+            )
+        )
+
+        # Window events
+        windowed = (
+            events
+            | 'Window' >> beam.WindowInto(
+                beam.window.FixedWindows(__HOLE_window_size__)
+            )
+        )
+
+        # Process events
+        processed = (
+            windowed
+            | 'Process' >> beam.ParDo(ProcessEventFn())
+            | 'Buffer' >> beam.transforms.util.BatchElements(
+                min_batch_size=__HOLE_buffer_size__
+            )
+        )
+
+        # Write results
+        processed | 'Write' >> beam.io.WriteToBigQuery(
+            table='PROJECT:DATASET.TABLE',
+            write_disposition=beam.io.BigQueryDisposition.WRITE_APPEND
+        )
+
+class ProcessEventFn(beam.DoFn):
+    """Process individual events."""
+
+    def process(self, element):
+        # Process event
+        yield element
+'''
+
+        holes = [
+            Hole(
+                id="window_size",
+                name="window_size",
+                hole_type="value",
+                constraints=[("range", 1, 3600)],
+                location={"context": "Window duration in seconds"}
+            ),
+            Hole(
+                id="parallelism",
+                name="parallelism",
+                hole_type="value",
+                constraints=[("range", 1, 100)],
+                location={"context": "Maximum number of workers"}
+            ),
+            Hole(
+                id="buffer_size",
+                name="buffer_size",
+                hole_type="value",
+                constraints=[("range", 100, 10000)],
+                location={"context": "Batch buffer size"}
+            )
+        ]
+
+        return ProgramSketch(
+            template=template,
+            holes=holes,
+            language="python",
+            framework="Apache Beam",
+            constraints=[]
+        )
+
+    def _generate_batch_sketch(self, spec: FormalSpecification) -> ProgramSketch:
+        """
+        Generate batch processing pipeline sketch.
+
+        Creates a batch job template with holes for:
+        - batch_size: Number of records per batch (100-10000)
+        - parallelism: Number of parallel workers (1-50)
+
+        Args:
+            spec: Formal specification
+
+        Returns:
+            ProgramSketch for batch processing
+
+        References:
+        - TD Commons: Batch processing pattern
+        """
+        template = '''import apache_beam as beam
+from apache_beam.options.pipeline_options import PipelineOptions
+
+def create_batch_pipeline():
+    """
+    Batch processing pipeline.
+
+    Synthesized configuration:
+    - Batch size: __HOLE_batch_size__ records
+    - Parallelism: __HOLE_parallelism__ workers
+    """
+    options = PipelineOptions(
+        runner='DataflowRunner',
+        max_num_workers=__HOLE_parallelism__
+    )
+
+    with beam.Pipeline(options=options) as pipeline:
+        # Read batch data
+        data = (
+            pipeline
+            | 'Read' >> beam.io.ReadFromText('gs://bucket/input/*.txt')
+        )
+
+        # Process in batches
+        processed = (
+            data
+            | 'Batch' >> beam.BatchElements(
+                min_batch_size=__HOLE_batch_size__
+            )
+            | 'Process' >> beam.ParDo(ProcessBatchFn())
+        )
+
+        # Write results
+        processed | 'Write' >> beam.io.WriteToText('gs://bucket/output')
+
+class ProcessBatchFn(beam.DoFn):
+    """Process batch of records."""
+
+    def process(self, batch):
+        # Process batch
+        for record in batch:
+            yield record
+'''
+
+        holes = [
+            Hole(
+                id="batch_size",
+                name="batch_size",
+                hole_type="value",
+                constraints=[("range", 100, 10000)],
+                location={"context": "Records per batch"}
+            ),
+            Hole(
+                id="parallelism",
+                name="parallelism",
+                hole_type="value",
+                constraints=[("range", 1, 50)],
+                location={"context": "Number of parallel workers"}
+            )
+        ]
+
+        return ProgramSketch(
+            template=template,
+            holes=holes,
+            language="python",
+            framework="Apache Beam",
+            constraints=[]
+        )
+
+    def _generate_api_sketch(self, spec: FormalSpecification) -> ProgramSketch:
+        """
+        Generate REST API service sketch.
+
+        Creates an API service template with holes for:
+        - max_connections: Maximum concurrent connections (10-1000)
+        - timeout: Request timeout in milliseconds (100-30000)
+
+        Args:
+            spec: Formal specification
+
+        Returns:
+            ProgramSketch for API service
+
+        References:
+        - TD Commons: API service pattern
+        - FastAPI: https://fastapi.tiangolo.com/
+        """
+        template = '''from fastapi import FastAPI
+from pydantic import BaseModel
+import uvicorn
+
+app = FastAPI()
+
+# Synthesized configuration
+MAX_CONNECTIONS = __HOLE_max_connections__
+TIMEOUT_MS = __HOLE_timeout__
+
+class Request(BaseModel):
+    """API request model."""
+    data: dict
+
+class Response(BaseModel):
+    """API response model."""
+    result: dict
+    status: str
+
+@app.post("/process")
+async def process(request: Request) -> Response:
+    """Process API request."""
+    # Process request
+    result = {"processed": request.data}
+    return Response(result=result, status="success")
+
+if __name__ == "__main__":
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=8080,
+        limit_concurrency=MAX_CONNECTIONS,
+        timeout_keep_alive=TIMEOUT_MS // 1000
+    )
+'''
+
+        holes = [
+            Hole(
+                id="max_connections",
+                name="max_connections",
+                hole_type="value",
+                constraints=[("range", 10, 1000)],
+                location={"context": "Maximum concurrent connections"}
+            ),
+            Hole(
+                id="timeout",
+                name="timeout",
+                hole_type="value",
+                constraints=[("range", 100, 30000)],
+                location={"context": "Request timeout in milliseconds"}
+            )
+        ]
+
+        return ProgramSketch(
+            template=template,
+            holes=holes,
+            language="python",
+            framework="FastAPI",
+            constraints=[]
+        )
+
+    def _generate_generic_sketch(self, spec: FormalSpecification) -> ProgramSketch:
+        """
+        Generate generic program sketch.
+
+        Creates a simple generic template with basic configuration holes
+        when no specific pattern is detected.
+
+        Args:
+            spec: Formal specification
+
+        Returns:
+            ProgramSketch for generic implementation
+
+        References:
+        - CEGIS: Generic sketch generation
+        """
         template = """
 # Synthesized implementation
 def synthesized_function(inputs):
+    '''
+    Generic synthesized function.
+
+    Configuration:
+    - param1: __HOLE_param1__
+    - param2: __HOLE_param2__
+    '''
     # Configuration parameters
-    param1 = __HOLE_h1__
-    param2 = __HOLE_h2__
+    param1 = __HOLE_param1__
+    param2 = __HOLE_param2__
 
     # Simple computation (placeholder)
     result = param1 * inputs.get('x', 0) + param2
@@ -406,13 +796,13 @@ def synthesized_function(inputs):
 
         holes = [
             Hole(
-                id="h1",
+                id="param1",
                 name="param1",
                 hole_type="value",
                 constraints=[("range", 0, 100)]
             ),
             Hole(
-                id="h2",
+                id="param2",
                 name="param2",
                 hole_type="value",
                 constraints=[("range", 0, 100)]

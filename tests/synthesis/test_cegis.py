@@ -478,6 +478,235 @@ class TestSynthesizerWithoutZ3:
 
 
 @pytest.mark.skipif(not is_z3_available(), reason="Z3 not installed")
+class TestHeuristicSynthesis:
+    """Tests for heuristic-based hole synthesis."""
+
+    def test_heuristic_window_size_low_latency(self):
+        """Test window_size heuristic with low latency requirement."""
+        spec = FormalSpecification(
+            properties=[
+                TemporalProperty(
+                    operator=TemporalOperator.WITHIN,
+                    predicate="process",
+                    time_bound=500  # 500ms - very low latency
+                )
+            ]
+        )
+        sketch = ProgramSketch(
+            template="window = __HOLE_window_size__",
+            holes=[
+                Hole(
+                    id="window_size",
+                    name="window_size",
+                    hole_type="value",
+                    constraints=[("range", 1, 3600)]
+                )
+            ]
+        )
+
+        synth = Synthesizer()
+        success = synth._synthesize_holes_heuristic(sketch, spec)
+
+        assert success is True
+        assert sketch.holes[0].is_filled()
+        # Low latency should result in small window (10s)
+        assert sketch.holes[0].filled_value == 10
+
+    def test_heuristic_parallelism_high_throughput(self):
+        """Test parallelism heuristic with throughput requirement."""
+        spec = FormalSpecification(
+            properties=[
+                TemporalProperty(
+                    operator=TemporalOperator.ALWAYS,
+                    predicate="high_throughput_processing"
+                )
+            ]
+        )
+        sketch = ProgramSketch(
+            template="workers = __HOLE_parallelism__",
+            holes=[
+                Hole(
+                    id="parallelism",
+                    name="parallelism",
+                    hole_type="value",
+                    constraints=[("range", 1, 100)]
+                )
+            ]
+        )
+
+        synth = Synthesizer()
+        success = synth._synthesize_holes_heuristic(sketch, spec)
+
+        assert success is True
+        assert sketch.holes[0].is_filled()
+        # High throughput should result in more workers
+        assert sketch.holes[0].filled_value == 50
+
+    def test_heuristic_buffer_size_default(self):
+        """Test buffer_size heuristic default value."""
+        spec = FormalSpecification()
+        sketch = ProgramSketch(
+            template="buffer = __HOLE_buffer_size__",
+            holes=[
+                Hole(
+                    id="buffer_size",
+                    name="buffer_size",
+                    hole_type="value",
+                    constraints=[("range", 100, 10000)]
+                )
+            ]
+        )
+
+        synth = Synthesizer()
+        success = synth._synthesize_holes_heuristic(sketch, spec)
+
+        assert success is True
+        assert sketch.holes[0].is_filled()
+        # Default buffer size should be 1000
+        assert sketch.holes[0].filled_value == 1000
+
+    def test_heuristic_timeout_from_latency(self):
+        """Test timeout heuristic based on latency constraint."""
+        spec = FormalSpecification(
+            properties=[
+                TemporalProperty(
+                    operator=TemporalOperator.WITHIN,
+                    predicate="respond",
+                    time_bound=2000  # 2 seconds
+                )
+            ]
+        )
+        sketch = ProgramSketch(
+            template="timeout = __HOLE_timeout__",
+            holes=[
+                Hole(
+                    id="timeout",
+                    name="timeout",
+                    hole_type="value",
+                    constraints=[("range", 100, 30000)]
+                )
+            ]
+        )
+
+        synth = Synthesizer()
+        success = synth._synthesize_holes_heuristic(sketch, spec)
+
+        assert success is True
+        assert sketch.holes[0].is_filled()
+        # Timeout should be 2x min latency = 4000ms
+        assert sketch.holes[0].filled_value == 4000
+
+    def test_heuristic_respects_constraints(self):
+        """Test that heuristics respect hole constraints."""
+        spec = FormalSpecification()
+        sketch = ProgramSketch(
+            template="size = __HOLE_window_size__",
+            holes=[
+                Hole(
+                    id="window_size",
+                    name="window_size",
+                    hole_type="value",
+                    constraints=[("range", 100, 200)]  # Narrow range
+                )
+            ]
+        )
+
+        synth = Synthesizer()
+        success = synth._synthesize_holes_heuristic(sketch, spec)
+
+        assert success is True
+        assert sketch.holes[0].is_filled()
+        # Default is 60, but constraint forces it to max 200
+        value = sketch.holes[0].filled_value
+        assert 100 <= value <= 200
+
+    def test_heuristic_generic_hole_midpoint(self):
+        """Test generic hole uses midpoint of range."""
+        spec = FormalSpecification()
+        sketch = ProgramSketch(
+            template="custom = __HOLE_custom_param__",
+            holes=[
+                Hole(
+                    id="custom_param",
+                    name="custom_param",
+                    hole_type="value",
+                    constraints=[("range", 0, 100)]
+                )
+            ]
+        )
+
+        synth = Synthesizer()
+        success = synth._synthesize_holes_heuristic(sketch, spec)
+
+        assert success is True
+        assert sketch.holes[0].is_filled()
+        # Should use midpoint of range
+        assert sketch.holes[0].filled_value == 50
+
+    def test_heuristic_fills_all_holes(self):
+        """Test heuristic fills multiple holes."""
+        spec = FormalSpecification()
+        sketch = ProgramSketch(
+            template="config",
+            holes=[
+                Hole("h1", "window_size", "value", [("range", 1, 3600)]),
+                Hole("h2", "parallelism", "value", [("range", 1, 100)]),
+                Hole("h3", "buffer_size", "value", [("range", 100, 10000)])
+            ]
+        )
+
+        synth = Synthesizer()
+        success = synth._synthesize_holes_heuristic(sketch, spec)
+
+        assert success is True
+        assert all(h.is_filled() for h in sketch.holes)
+
+    def test_heuristic_predicate_hole(self):
+        """Test heuristic for boolean predicate hole."""
+        spec = FormalSpecification()
+        sketch = ProgramSketch(
+            template="enabled = __HOLE_flag__",
+            holes=[
+                Hole(
+                    id="flag",
+                    name="flag",
+                    hole_type="predicate"
+                )
+            ]
+        )
+
+        synth = Synthesizer()
+        success = synth._synthesize_holes_heuristic(sketch, spec)
+
+        assert success is True
+        assert sketch.holes[0].is_filled()
+        assert isinstance(sketch.holes[0].filled_value, bool)
+        assert sketch.holes[0].filled_value is True  # Default True
+
+    def test_heuristic_expression_hole(self):
+        """Test heuristic for expression (real) hole."""
+        spec = FormalSpecification()
+        sketch = ProgramSketch(
+            template="threshold = __HOLE_thresh__",
+            holes=[
+                Hole(
+                    id="thresh",
+                    name="thresh",
+                    hole_type="expression"
+                )
+            ]
+        )
+
+        synth = Synthesizer()
+        success = synth._synthesize_holes_heuristic(sketch, spec)
+
+        assert success is True
+        assert sketch.holes[0].is_filled()
+        assert isinstance(sketch.holes[0].filled_value, float)
+        assert sketch.holes[0].filled_value == 0.5  # Default 0.5
+
+
+@pytest.mark.skipif(not is_z3_available(), reason="Z3 not installed")
 class TestPatternInference:
     """Tests for pattern-specific sketch generation."""
 

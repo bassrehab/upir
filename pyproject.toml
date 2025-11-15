@@ -9,10 +9,10 @@ description = "Universal Plan Intermediate Representation - Formal verification,
 readme = "README.md"
 license = {text = "Apache-2.0"}
 authors = [
-    {name = "Subhadip Mitra", email = "your.email@example.com"}
+    {name = "Subhadip Mitra", email = "contact@subhadipmitra.com"}
 ]
 maintainers = [
-    {name = "Subhadip Mitra", email = "your.email@example.com"}
+    {name = "Subhadip Mitra", email = "contact@subhadipmitra.com"}
 ]
 keywords = [
     "formal-verification",
@@ -70,11 +70,11 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/upir"
-Documentation = "https://upir.readthedocs.io"
-Repository = "https://github.com/yourusername/upir"
-Issues = "https://github.com/yourusername/upir/issues"
-Changelog = "https://github.com/yourusername/upir/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/bassrehab/upir"
+Documentation = "https://upir.subhadipmitra.com"
+Repository = "https://github.com/bassrehab/upir"
+Issues = "https://github.com/bassrehab/upir/issues"
+Changelog = "https://github.com/bassrehab/upir/blob/main/CHANGELOG.md"
 
 [tool.setuptools]
 packages = ["upir", "upir.core", "upir.verification", "upir.synthesis", "upir.learning", "upir.patterns"]

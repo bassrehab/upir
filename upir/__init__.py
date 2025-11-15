@@ -1,0 +1,50 @@
+"""
+UPIR: Universal Plan Intermediate Representation
+
+Formal verification, synthesis, and optimization for distributed systems.
+
+Based on TD Commons disclosure:
+https://www.tdcommons.org/dpubs_series/8852/
+
+Author: Subhadip Mitra
+License: Apache 2.0
+"""
+
+__version__ = "0.1.0"
+__author__ = "Subhadip Mitra"
+__license__ = "Apache 2.0"
+
+# Main exports
+from upir.core.upir import UPIR
+from upir.core.architecture import Architecture
+from upir.core.specification import FormalSpecification
+from upir.core.temporal import TemporalOperator, TemporalProperty
+from upir.verification.verifier import Verifier
+from upir.synthesis.cegis import Synthesizer
+from upir.learning.rl_optimizer import RLOptimizer
+from upir.patterns.pattern import Pattern
+from upir.patterns.extractor import PatternExtractor
+from upir.patterns.library import PatternLibrary
+
+__all__ = [
+    # Core classes
+    "UPIR",
+    "Architecture",
+    "FormalSpecification",
+    "TemporalOperator",
+    "TemporalProperty",
+    # Verification
+    "Verifier",
+    # Synthesis
+    "Synthesizer",
+    # Learning
+    "RLOptimizer",
+    # Patterns
+    "Pattern",
+    "PatternExtractor",
+    "PatternLibrary",
+    # Metadata
+    "__version__",
+    "__author__",
+    "__license__",
+]

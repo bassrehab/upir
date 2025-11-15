@@ -17,14 +17,13 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="upir",
-    use_scm_version=True,
-    setup_requires=["setuptools_scm"],
+    version="0.1.0",
     description="Universal Plan Intermediate Representation - Formal verification, synthesis, and optimization for distributed systems",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Subhadip Mitra",
-    author_email="your.email@example.com",
-    url="https://github.com/yourusername/upir",
+    author_email="contact@subhadipmitra.com",
+    url="https://github.com/bassrehab/upir",
     license="Apache-2.0",
     packages=find_packages(exclude=["tests", "tests.*", "examples", "docs"]),
     python_requires=">=3.11",
@@ -69,9 +68,9 @@ setup(
     ],
     keywords="formal-verification program-synthesis distributed-systems smt cegis reinforcement-learning",
     project_urls={
-        "Documentation": "https://upir.readthedocs.io",
-        "Source": "https://github.com/yourusername/upir",
-        "Issues": "https://github.com/yourusername/upir/issues",
+        "Documentation": "https://upir.subhadipmitra.com",
+        "Source": "https://github.com/bassrehab/upir",
+        "Issues": "https://github.com/bassrehab/upir/issues",
     },
     package_data={
         "upir": ["py.typed"],

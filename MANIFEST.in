@@ -1,0 +1,34 @@
+# Include documentation and license files
+include README.md
+include LICENSE
+include requirements.txt
+include pyproject.toml
+
+# Include all Python source files
+recursive-include upir *.py
+
+# Include type hints marker
+recursive-include upir py.typed
+
+# Exclude test files and examples from distribution
+recursive-exclude tests *
+recursive-exclude examples *
+recursive-exclude docs *
+
+# Exclude development files
+exclude CLAUDE.md
+exclude PROMPTS.md
+exclude SOURCES.md
+exclude JOURNAL.md
+exclude BOOTSTRAP.md
+exclude SETUP_CHECKLIST.md
+exclude PUBLISHING_CHECKLIST.md
+exclude .gitignore
+exclude .DS_Store
+
+# Exclude cache and build artifacts
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *$py.class
+global-exclude *.so
+global-exclude .DS_Store

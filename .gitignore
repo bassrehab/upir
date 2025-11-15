@@ -53,3 +53,4 @@ ENV/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+/PUBLISHING_CHECKLIST.md

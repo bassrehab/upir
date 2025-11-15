@@ -1,278 +1,833 @@
-# UPIR - Universal Plan Intermediate Representation
+# UPIR: Universal Plan Intermediate Representation
 
-> Formal verification, automatic synthesis, and continuous optimization for distributed systems
+**Formal verification, automatic synthesis, and continuous optimization of distributed system architectures.**
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-## What is UPIR?
+---
 
-UPIR is a breakthrough system that bridges the gap between architectural intent and implementation reality through mathematical guarantees. It combines three powerful techniques:
+## 📋 Table of Contents
 
-- **Formal Verification**: Mathematically prove that architectures meet specifications
-- **Automatic Code Synthesis**: Generate correct implementations from formal specifications
-- **Continuous Optimization**: Learn from production metrics while maintaining formal invariants
+- [Overview](#overview)
+- [Attribution](#attribution)
+- [Key Features](#key-features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Core Concepts](#core-concepts)
+- [Usage Examples](#usage-examples)
+- [Architecture](#architecture)
+- [API Documentation](#api-documentation)
+- [Examples](#examples)
+- [Contributing](#contributing)
+- [License](#license)
+- [References](#references)
 
-## Key Features
+---
 
-- **SMT-based Verification** using Z3 theorem prover
-- **Incremental Verification** with proof caching (274x speedup)
-- **CEGIS Synthesis** for distributed systems
-- **RL-based Optimization** using Proximal Policy Optimization (PPO)
-- **Pattern Extraction** via clustering (89.9% reuse potential)
-- **Cryptographic Proof Certificates** for audit trails
+## 🎯 Overview
 
-## Installation
+UPIR (Universal Plan Intermediate Representation) is an open-source framework for **formally specifying, verifying, synthesizing, and optimizing distributed system architectures**. It bridges the gap between high-level architectural requirements and production-ready implementations.
+
+### What UPIR Does
+
+- ✅ **Formal Verification**: Prove that your architecture satisfies correctness properties using SMT solvers
+- 🔧 **Automatic Synthesis**: Generate implementation code from architectural specifications using CEGIS
+- 📈 **Continuous Optimization**: Learn from production metrics to improve architectures using reinforcement learning
+- 🎨 **Pattern Management**: Extract and reuse proven architectural patterns
+- 🔍 **Incremental Verification**: Cache proofs for faster iteration
+
+### Why UPIR?
+
+Designing distributed systems is hard. Traditional approaches rely on:
+- Manual design prone to errors
+- Ad-hoc validation that misses edge cases
+- Trial-and-error optimization that wastes resources
+- Reinventing patterns instead of reusing proven solutions
+
+UPIR automates these processes using **formal methods**, **program synthesis**, and **machine learning**.
+
+---
+
+## 📜 Attribution
+
+This is a **clean-room implementation** based solely on public sources:
+
+**Primary Source**: [Automated Synthesis and Verification of Distributed Systems Using UPIR](https://www.tdcommons.org/dpubs_series/8852/) by Subhadip Mitra, published at TD Commons under CC BY 4.0 license.
+
+Additional references listed in [SOURCES.md](SOURCES.md).
+
+**Author**: Subhadip Mitra
+**License**: Apache 2.0
+**Project Status**: Personal open source project, not affiliated with Google
+
+---
+
+## ✨ Key Features
+
+### 1. Formal Specifications with Temporal Logic
+
+Define requirements using Linear Temporal Logic (LTL):
+
+```python
+from upir.core.temporal import TemporalOperator, TemporalProperty
+
+# ALWAYS: Data consistency must always hold
+always_consistent = TemporalProperty(
+    operator=TemporalOperator.ALWAYS,
+    predicate="data_consistent"
+)
+
+# WITHIN: Respond within 100ms
+low_latency = TemporalProperty(
+    operator=TemporalOperator.WITHIN,
+    predicate="respond",
+    time_bound=100  # milliseconds
+)
+```
+
+### 2. SMT-Based Verification
+
+Verify architectures satisfy specifications:
+
+```python
+from upir.verification.verifier import Verifier
+from upir.verification.solver import VerificationStatus
+
+verifier = Verifier()
+results = verifier.verify_specification(upir)
+
+for result in results:
+    if result.status == VerificationStatus.PROVED:
+        print(f"✓ Verified: {result.property.predicate}")
+    else:
+        print(f"✗ Failed: {result.property.predicate}")
+        print(f"  Counterexample: {result.counterexample}")
+```
+
+### 3. Program Synthesis with CEGIS
+
+Generate code from specifications:
+
+```python
+from upir.synthesis.cegis import Synthesizer
+
+synthesizer = Synthesizer(max_iterations=10)
+sketch = synthesizer.generate_sketch(specification)
+result = synthesizer.synthesize(upir, sketch)
+
+if result.status.value == "SUCCESS":
+    print(result.implementation)  # Generated code!
+```
+
+### 4. Reinforcement Learning Optimization
+
+Optimize architectures based on production metrics:
+
+```python
+from upir.learning.learner import ArchitectureLearner
+
+learner = ArchitectureLearner()
+metrics = {"latency_p99": 150, "throughput_qps": 5000}
+optimized_upir = learner.learn_from_metrics(upir, metrics)
+```
+
+### 5. Pattern Library
+
+Discover and reuse architectural patterns:
+
+```python
+from upir.patterns.library import PatternLibrary
+
+library = PatternLibrary()
+matches = library.match_architecture(upir, threshold=0.8)
+
+for pattern, score in matches:
+    print(f"{pattern.name}: {score:.1%} match")
+```
+
+---
+
+## 🚀 Installation
+
+### Prerequisites
+
+- Python 3.11 or higher
+- pip or poetry for package management
+
+### From Source
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/upir-open.git
+cd upir-open
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -e .
+
+# Install development dependencies (optional)
+pip install -e ".[dev]"
+```
+
+### Using pip (when published)
 
 ```bash
 pip install upir
 ```
 
-From source:
+### Verify Installation
 
 ```bash
-git clone https://github.com/yourusername/upir.git
-cd upir
-pip install -e .
+python -c "import upir; print('UPIR installed successfully')"
 ```
 
-## Quick Start
+---
+
+## 🎓 Quick Start
+
+Here's a complete example of designing a streaming pipeline with UPIR:
 
 ```python
-from upir import UPIR, FormalSpecification, TemporalProperty, TemporalOperator
+from upir.core.architecture import Architecture
+from upir.core.specification import FormalSpecification
+from upir.core.temporal import TemporalOperator, TemporalProperty
+from upir.core.upir import UPIR
+from upir.verification.verifier import Verifier
+from upir.verification.solver import VerificationStatus
 
-# Define formal specification
+# 1. Define formal specification
 spec = FormalSpecification(
+    properties=[
+        TemporalProperty(
+            operator=TemporalOperator.WITHIN,
+            predicate="process_event",
+            time_bound=100  # 100ms latency requirement
+        )
+    ],
     invariants=[
         TemporalProperty(
-            operator=TemporalOperator.EVENTUALLY,
-            predicate="all_events_processed",
-            time_bound=100.0
-        ),
-        TemporalProperty(
             operator=TemporalOperator.ALWAYS,
-            predicate="data_consistency"
+            predicate="data_consistent"
         )
     ],
     constraints={
-        "latency": {"max": 100},
-        "cost": {"max": 5000},
-        "availability": {"min": 0.999}
+        "latency_p99": {"max": 100.0},
+        "monthly_cost": {"max": 5000.0}
     }
 )
 
-# Create UPIR instance
+# 2. Create architecture
+components = [
+    {"id": "pubsub", "name": "Event Source", "type": "pubsub_source"},
+    {"id": "beam", "name": "Processor", "type": "streaming_processor"},
+    {"id": "bq", "name": "Database", "type": "database"}
+]
+
+connections = [
+    {"from": "pubsub", "to": "beam"},
+    {"from": "beam", "to": "bq"}
+]
+
+arch = Architecture(components=components, connections=connections)
+
+# 3. Create UPIR instance
 upir = UPIR(
-    name="Streaming Pipeline",
+    id="streaming-pipeline",
+    name="Real-time Event Processing",
+    description="Streaming pipeline for event analytics",
+    architecture=arch,
     specification=spec
 )
 
-# Verify specification
-from upir.verification import Verifier
+# 4. Verify specification
 verifier = Verifier()
 results = verifier.verify_specification(upir)
 
+print(f"Verified {len(results)} properties")
 for result in results:
-    if result.verified:
-        print(f"✓ Proved: {result.property.predicate}")
-    else:
-        print(f"✗ Failed: {result.property.predicate}")
-        print(f"  Counterexample: {result.counterexample}")
-
-# Synthesize implementation
-from upir.synthesis import Synthesizer
-synthesizer = Synthesizer()
-synthesis_result = synthesizer.synthesize(upir)
-
-if synthesis_result.status == "success":
-    print(f"Generated code:\n{synthesis_result.implementation.code}")
-
-# Optimize from production metrics
-from upir.learning import ArchitectureLearner
-learner = ArchitectureLearner(state_dim=64, action_dim=40)
-
-metrics = {
-    "latency": 95,
-    "throughput": 1200,
-    "cost": 4800
-}
-
-optimized_upir = learner.learn_from_metrics(upir, metrics)
+    print(f"  {result.property.predicate}: {result.status.value}")
 ```
 
-## Core Concepts
+**Output:**
+```
+Verified 2 properties
+  process_event: PROVED
+  data_consistent: PROVED
+```
 
-### Temporal Properties
+See [examples/streaming_example.py](examples/streaming_example.py) for a complete workflow including synthesis, optimization, and pattern extraction.
 
-Express time-bounded requirements using temporal logic:
+---
+
+## 📚 Core Concepts
+
+### 1. UPIR Instance
+
+A UPIR represents a complete distributed system design:
+
+```
+UPIR
+├── Architecture (components + connections)
+├── Specification (properties + constraints)
+├── Evidence (supporting documentation)
+├── Reasoning (design decisions)
+└── Metadata (versioning, ownership)
+```
+
+**Key components:**
+
+- **Architecture**: Physical structure (microservices, databases, queues)
+- **Specification**: Formal requirements (latency, consistency, availability)
+- **Evidence**: Documentation, test results, performance data
+- **Reasoning**: Design rationale and trade-offs
+
+### 2. Temporal Properties
+
+Express requirements using Linear Temporal Logic (LTL):
+
+| Operator | Meaning | Example |
+|----------|---------|---------|
+| `ALWAYS` | Property holds at all times | `□ data_consistent` |
+| `EVENTUALLY` | Property holds at some future time | `◇ all_events_processed` |
+| `WITHIN` | Property holds within time bound | `◇_{≤100ms} respond` |
+| `UNTIL` | Property holds until another holds | `processing □ complete` |
+
+**Implementation:**
 
 ```python
-# Property must ALWAYS hold
+# Safety property: Always maintain consistency
 TemporalProperty(
     operator=TemporalOperator.ALWAYS,
-    predicate="data_consistency"
+    predicate="data_consistent"
 )
 
-# Property must EVENTUALLY hold within 100 seconds
+# Liveness property: Eventually complete processing
 TemporalProperty(
     operator=TemporalOperator.EVENTUALLY,
-    predicate="all_events_processed",
-    time_bound=100.0
+    predicate="processing_complete",
+    time_bound=60000  # Within 60 seconds
 )
 ```
 
-### Formal Specification
+### 3. Formal Verification
 
-Combine properties with resource constraints:
+UPIR uses SMT (Satisfiability Modulo Theories) solvers to prove correctness:
+
+1. **Encode** architecture and specification as logical formulas
+2. **Solve** using Z3 SMT solver
+3. **Verify** if properties hold for all possible executions
+4. **Generate** counterexamples if verification fails
+
+**Verification results:**
+- `PROVED`: Property definitely holds ✓
+- `DISPROVED`: Counterexample found ✗
+- `UNKNOWN`: Solver couldn't determine
+- `TIMEOUT`: Exceeded time limit
+
+### 4. Program Synthesis (CEGIS)
+
+Counterexample-Guided Inductive Synthesis:
+
+```
+1. Generate program sketch with holes
+   └─> def process(data): return data.window(size=???)
+
+2. Fill holes with candidate values
+   └─> def process(data): return data.window(size=60)
+
+3. Verify against specification
+   └─> Verify latency ≤ 100ms
+
+4. If verification fails, use counterexample to refine
+   └─> Counterexample: size=60 causes 150ms latency
+
+5. Repeat until successful or max iterations
+   └─> Try size=30 → Verified! ✓
+```
+
+### 5. Reinforcement Learning Optimization
+
+Use Proximal Policy Optimization (PPO) to learn optimal architectures:
+
+```
+State: Current architecture features
+Action: Modify component (parallelism, type, connections)
+Reward: Performance improvement + constraint satisfaction
+Policy: Learn which modifications work best
+```
+
+**Optimization loop:**
 
 ```python
+for iteration in range(num_iterations):
+    # 1. Encode current architecture
+    state = learner.encode_state(upir)
+
+    # 2. Select optimization action (via PPO)
+    action, _, _ = learner.ppo.select_action(state)
+
+    # 3. Apply modification
+    optimized_upir = learner.decode_action(action, upir)
+
+    # 4. Measure new metrics
+    new_metrics = simulate_deployment(optimized_upir)
+
+    # 5. Compute reward
+    reward = learner.compute_reward(new_metrics, spec)
+
+    # 6. Update policy
+    learner._update_policy()
+```
+
+### 6. Pattern Library
+
+Discover, store, and reuse architectural patterns:
+
+```python
+library = PatternLibrary()
+
+# Built-in patterns:
+# - Streaming ETL Pipeline
+# - Batch Processing Pipeline
+# - Request-Response API
+# - Event-Driven Microservices
+# - Lambda Architecture
+# - CQRS, Event Sourcing, etc.
+
+# Match your architecture
+matches = library.match_architecture(upir, threshold=0.8)
+
+# Use best match as starting point
+best_pattern, score = matches[0]
+template = best_pattern.template
+```
+
+---
+
+## 💡 Usage Examples
+
+### Example 1: Verify Latency Requirements
+
+```python
+from upir.core.specification import FormalSpecification
+from upir.core.temporal import TemporalOperator, TemporalProperty
+
+# Define latency requirement
 spec = FormalSpecification(
-    invariants=[...],        # Must always hold
-    properties=[...],        # Desired properties
-    constraints={            # Resource bounds
-        "latency": {"max": 100},
-        "throughput": {"min": 1000},
-        "cost": {"max": 5000}
-    },
-    assumptions=[            # Environmental assumptions
-        "network_reliable",
-        "storage_available"
+    properties=[
+        TemporalProperty(
+            operator=TemporalOperator.WITHIN,
+            predicate="api_response",
+            time_bound=50  # 50ms
+        )
     ]
 )
+
+# Create architecture with API gateway
+components = [
+    {"id": "lb", "type": "load_balancer", "latency_ms": 5},
+    {"id": "api", "type": "api_server", "latency_ms": 20},
+    {"id": "cache", "type": "cache", "latency_ms": 2},
+    {"id": "db", "type": "database", "latency_ms": 15}
+]
+
+# Total latency: 5 + 20 + 2 + 15 = 42ms < 50ms ✓
 ```
 
-### Evidence and Reasoning
-
-Track decisions with Bayesian confidence:
+### Example 2: Synthesize Batch Processing Pipeline
 
 ```python
-from upir.core import Evidence, ReasoningNode
+from upir.synthesis.cegis import Synthesizer
 
-# Add evidence
-evidence = Evidence(
-    source="load_test",
-    type="benchmark",
-    data={"p99_latency": 95},
-    confidence=0.9
+# Specification for batch job
+spec = FormalSpecification(
+    properties=[
+        TemporalProperty(
+            operator=TemporalOperator.EVENTUALLY,
+            predicate="batch_complete",
+            time_bound=3600000  # 1 hour
+        )
+    ],
+    constraints={
+        "throughput_records_per_sec": {"min": 10000}
+    }
 )
-evidence_id = upir.add_evidence(evidence)
 
-# Document reasoning
-node = ReasoningNode(
-    decision="Use Pub/Sub for event ingestion",
-    rationale="Low latency, exactly-once semantics",
-    evidence_ids=[evidence_id],
-    alternatives=[
-        {"option": "Kafka", "rejected_because": "Higher operational overhead"},
-        {"option": "RabbitMQ", "rejected_because": "Lower throughput"}
-    ]
-)
-upir.add_reasoning(node)
+# Synthesize implementation
+synthesizer = Synthesizer()
+sketch = synthesizer.generate_sketch(spec)
+result = synthesizer.synthesize(upir, sketch)
 
-# Compute overall confidence
-confidence = upir.compute_overall_confidence()
-print(f"Architecture confidence: {confidence:.2%}")
+# Get generated code
+if result.status.value == "SUCCESS":
+    with open("batch_pipeline.py", "w") as f:
+        f.write(result.implementation)
 ```
 
-## Examples
+### Example 3: Optimize for Cost
 
-### Streaming Pipeline
+```python
+from upir.learning.learner import ArchitectureLearner
 
-See [examples/streaming_pipeline.py](examples/streaming_pipeline.py) for a complete streaming ETL pipeline with:
-- Formal specification of latency and consistency requirements
-- Automatic synthesis of Apache Beam code
-- RL-based optimization of parallelism and window size
+learner = ArchitectureLearner()
 
-### Batch Processing
+# Current metrics
+current_metrics = {
+    "latency_p99": 45,
+    "throughput_qps": 15000,
+    "monthly_cost": 8000  # Over budget!
+}
 
-See [examples/batch_processing.py](examples/batch_processing.py) for batch job optimization.
+# Optimize
+for i in range(10):  # 10 optimization iterations
+    optimized_upir = learner.learn_from_metrics(
+        upir,
+        current_metrics,
+        previous_metrics
+    )
 
-### Microservices API
+    # Simulate new metrics
+    current_metrics = simulate(optimized_upir)
 
-See [examples/api_service.py](examples/api_service.py) for API timeout synthesis.
+    if current_metrics["monthly_cost"] <= 5000:
+        print(f"✓ Optimized in {i+1} iterations")
+        break
+```
 
-## Performance
+### Example 4: Pattern Matching
 
-Based on benchmarks from the [TD Commons disclosure](https://www.tdcommons.org/dpubs_series/8852/):
+```python
+from upir.patterns.library import PatternLibrary
 
-- **274x verification speedup** for 64-component systems (vs. monolithic verification)
-- **1.97ms average synthesis time** with 43-75% success rates
-- **60.1% latency reduction** and 194.5% throughput improvement via RL optimization
-- **89.9% pattern reuse potential** identified through clustering
-- **Convergence in 45 episodes** for constrained RL optimization
+library = PatternLibrary()
+
+# Find patterns for your architecture
+matches = library.match_architecture(upir, threshold=0.7)
+
+print("Similar patterns:")
+for pattern, score in matches[:5]:
+    print(f"\n{pattern.name} ({score:.1%} match)")
+    print(f"  Success rate: {pattern.success_rate:.1%}")
+    print(f"  Avg latency: {pattern.average_performance.get('latency_p99', 'N/A')}ms")
+    print(f"  Instances: {len(pattern.instances)}")
+
+# Search patterns by criteria
+streaming_patterns = library.search_patterns({
+    "component_types": ["streaming_processor"],
+    "min_success_rate": 0.85
+})
+```
+
+---
 
 ## 🏗️ Architecture
 
+UPIR is organized into five main modules:
+
 ```
 upir/
-├── core/              # Data model (UPIR, FormalSpecification, Evidence)
-├── verification/      # Z3-based formal verification
-├── synthesis/         # CEGIS code synthesis
-├── learning/          # PPO-based optimization
-└── patterns/          # Pattern extraction and library
+├── core/           # Core data structures
+│   ├── upir.py           # Main UPIR class
+│   ├── architecture.py   # Component & connection definitions
+│   ├── specification.py  # Formal specifications
+│   ├── temporal.py       # Temporal logic operators
+│   ├── evidence.py       # Evidence & reasoning
+│   └── ...
+├── verification/   # Formal verification
+│   ├── verifier.py       # Main verifier (incremental)
+│   └── solver.py         # SMT solver interface (Z3)
+├── synthesis/      # Program synthesis
+│   ├── cegis.py          # CEGIS synthesizer
+│   └── sketch.py         # Program sketches
+├── learning/       # RL optimization
+│   ├── learner.py        # Architecture learner
+│   └── ppo.py            # PPO algorithm
+└── patterns/       # Pattern management
+    ├── pattern.py        # Pattern dataclass
+    ├── extractor.py      # Pattern extraction
+    └── library.py        # Pattern library
 ```
 
-## Contributing
+**Module Dependencies:**
 
-Contributions welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md).
+```
+core ←─── verification
+  ↑         ↑
+  │         │
+  └─── synthesis
+  │         ↑
+  │         │
+  └─── learning
+  │         ↑
+  │         │
+  └─── patterns
+```
 
-This is a clean room implementation based solely on public sources. All contributions must:
-- Be based on public documentation
-- Include proper source attribution
-- Pass tests and type checking
-- Follow the code style guide
+---
 
-## Documentation
+## 📖 API Documentation
 
-- [User Guide](docs/user_guide.md)
-- [API Reference](docs/api_reference.md)
-- [Architecture](docs/architecture.md)
-- [Examples](examples/)
+### Core Classes
 
-## References
+#### `UPIR`
+
+Main class representing a complete system design.
+
+```python
+class UPIR:
+    """Universal Plan Intermediate Representation."""
+
+    def __init__(
+        self,
+        id: str,
+        name: str,
+        description: str,
+        architecture: Optional[Architecture] = None,
+        specification: Optional[FormalSpecification] = None,
+        **kwargs
+    ):
+        """Create a UPIR instance."""
+```
+
+**Key Methods:**
+- `to_dict()`: Serialize to dictionary
+- `from_dict(data)`: Deserialize from dictionary
+- `compute_hash()`: Compute content hash
+- `validate()`: Validate consistency
+
+#### `FormalSpecification`
+
+Captures requirements.
+
+```python
+class FormalSpecification:
+    """Formal specification with temporal properties."""
+
+    properties: List[TemporalProperty]    # Liveness properties
+    invariants: List[TemporalProperty]    # Safety properties
+    constraints: Dict[str, Dict[str, Any]]  # Resource constraints
+    assumptions: List[str]                # Environmental assumptions
+```
+
+### Verification API
+
+#### `Verifier`
+
+Main verification interface.
+
+```python
+class Verifier:
+    """SMT-based verifier with incremental verification."""
+
+    def verify_specification(
+        self,
+        upir: UPIR
+    ) -> List[VerificationResult]:
+        """Verify all properties in specification."""
+
+    def verify_property(
+        self,
+        property: TemporalProperty,
+        architecture: Architecture
+    ) -> VerificationResult:
+        """Verify single property."""
+```
+
+### Synthesis API
+
+#### `Synthesizer`
+
+CEGIS-based synthesizer.
+
+```python
+class Synthesizer:
+    """Counterexample-guided inductive synthesis."""
+
+    def generate_sketch(
+        self,
+        spec: FormalSpecification
+    ) -> ProgramSketch:
+        """Generate program sketch with holes."""
+
+    def synthesize(
+        self,
+        upir: UPIR,
+        sketch: ProgramSketch
+    ) -> CEGISResult:
+        """Synthesize implementation from sketch."""
+```
+
+### Learning API
+
+#### `ArchitectureLearner`
+
+RL-based optimizer.
+
+```python
+class ArchitectureLearner:
+    """Learn optimal architectures using PPO."""
+
+    def learn_from_metrics(
+        self,
+        upir: UPIR,
+        metrics: Dict[str, float],
+        previous_metrics: Optional[Dict[str, float]] = None
+    ) -> UPIR:
+        """Optimize architecture based on metrics."""
+```
+
+### Patterns API
+
+#### `PatternLibrary`
+
+Pattern storage and matching.
+
+```python
+class PatternLibrary:
+    """Library of architectural patterns."""
+
+    def match_architecture(
+        self,
+        upir: UPIR,
+        threshold: float = 0.8
+    ) -> List[Tuple[Pattern, float]]:
+        """Find patterns matching architecture."""
+
+    def search_patterns(
+        self,
+        query: Dict[str, Any]
+    ) -> List[Pattern]:
+        """Search by component types, success rate, etc."""
+```
+
+---
+
+## 📂 Examples
+
+The `examples/` directory contains complete demonstrations:
+
+### `streaming_example.py`
+
+Complete workflow for real-time event processing pipeline:
+
+1. ✅ Define formal specification with temporal properties
+2. ✅ Create UPIR with Pub/Sub → Beam → BigQuery architecture
+3. ✅ Verify specification (all properties proved)
+4. ✅ Synthesize Apache Beam implementation
+5. ✅ Simulate production metrics
+6. ✅ Optimize using RL (3 iterations: 95ms → 79ms latency)
+7. ✅ Extract and save pattern for reuse
+
+**Run:**
+```bash
+PYTHONPATH=. python examples/streaming_example.py
+```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### Development Setup
+
+```bash
+# Clone repository
+git clone https://github.com/yourusername/upir-open.git
+cd upir-open
+
+# Create development environment
+python -m venv venv
+source venv/bin/activate
+
+# Install in editable mode with dev dependencies
+pip install -e ".[dev]"
+
+# Run tests
+pytest tests/ -v
+
+# Check coverage
+pytest tests/ --cov=upir --cov-report=html
+
+# Format code
+black upir/ tests/
+isort upir/ tests/
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the **Apache License 2.0** - see the [LICENSE](LICENSE) file for details.
+
+### Summary
+
+- ✅ **Free to use** for commercial and non-commercial purposes
+- ✅ **Modify and distribute** with attribution
+- ✅ **Patent grant** from contributors
+- ⚠️ **No warranty** provided
+
+---
+
+## 📚 References
 
 ### Primary Source
 
-This implementation is based on concepts from:
-
-**"Automated Synthesis and Verification of Distributed Systems Using UPIR"**
-Author: Subhadip Mitra
-Published: TD Commons, November 2025
-License: CC BY 4.0
-URL: https://www.tdcommons.org/dpubs_series/8852/
+**Mitra, Subhadip.** "Automated Synthesis and Verification of Distributed Systems Using UPIR."
+*TD Commons*, Defensive Publications Series, 8852 (2025).
+https://www.tdcommons.org/dpubs_series/8852/
+Licensed under CC BY 4.0
 
 ### Academic Papers
 
-- **CEGIS**: [Solar-Lezama et al. (2008)](https://people.csail.mit.edu/asolar/papers/Solar-Lezama08.pdf)
-- **PPO**: [Schulman et al. (2017)](https://arxiv.org/abs/1707.06347)
-- **Temporal Logic**: [Pnueli (1977)](https://www.cs.toronto.edu/~hehner/FMCO/Pnueli.pdf)
+**Verification & Synthesis:**
+- Solar-Lezama, Armando, et al. "Program synthesis by sketching." (2008)
+- Pnueli, Amir. "The temporal logic of programs." (1977)
+- De Moura, Leonardo, and Nikolaj Bjørner. "Z3: An efficient SMT solver." (2008)
 
-### Tools
+**Reinforcement Learning:**
+- Schulman, John, et al. "Proximal policy optimization algorithms." (2017)
+
+**Distributed Systems:**
+- Lamport, Leslie. "The part-time parliament." (1998) - Paxos
+- Chang, Fay, et al. "Bigtable: A distributed storage system." (2008)
+- Dean, Jeffrey, and Sanjay Ghemawat. "MapReduce: simplified data processing." (2008)
+
+### Tools & Frameworks
 
 - **Z3 Theorem Prover**: https://github.com/Z3Prover/z3
 - **Apache Beam**: https://beam.apache.org/
-- **Google Cloud Platform**: https://cloud.google.com/
+- **scikit-learn**: https://scikit-learn.org/
+- **Python dataclasses**: https://docs.python.org/3/library/dataclasses.html
 
-## License
+---
 
-Apache License 2.0 - see [LICENSE](LICENSE) for details.
+## 📞 Contact & Support
 
-This is an independent implementation created as a personal open source project by Subhadip Mitra. Not affiliated with or endorsed by Google LLC or any other organization.
+- **Author**: Subhadip Mitra
+- **Issues**: [GitHub Issues](https://github.com/yourusername/upir-open/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/upir-open/discussions)
 
-## Author
+---
 
-**Subhadip Mitra**
+## 🌟 Acknowledgments
 
-- Personal project
-- Based on TD Commons disclosure (CC BY 4.0)
-- Implemented using public sources only
+- **TD Commons** for publishing the foundational disclosure
+- **Apache Software Foundation** for Beam and other tools
+- **Z3 Team** at Microsoft Research for the SMT solver
+- **Open source community** for libraries and inspiration
 
-## Star History
+---
 
-If you find UPIR useful, please give it a star! ⭐
+<div align="center">
 
-## Contact
+**Built with ❤️ for the distributed systems community**
 
-- Issues: [GitHub Issues](https://github.com/yourusername/upir/issues)
-- Discussions: [GitHub Discussions](https://github.com/yourusername/upir/discussions)
+[⭐ Star on GitHub](https://github.com/yourusername/upir-open) | [🐛 Report Bug](https://github.com/yourusername/upir-open/issues) | [💡 Request Feature](https://github.com/yourusername/upir-open/issues)
+
+</div>

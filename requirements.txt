@@ -1,28 +1,12 @@
-# UPIR Dependencies
+# UPIR Core Dependencies
 # Clean room implementation - all dependencies are from public package repositories
+#
+# For development installation, use: pip install -e ".[dev]"
+# For GCP integration, use: pip install -e ".[gcp]"
+# For documentation, use: pip install -e ".[docs]"
+# For everything, use: pip install -e ".[dev,gcp,docs]"
 
-# Core dependencies
-z3-solver==4.12.2.0        # SMT solving for verification
-numpy>=1.24.3,<2.0.0       # Numerical computing
+# Core dependencies (required)
+z3-solver>=4.12.2          # SMT solving for verification
+numpy>=1.24.3,<2.0.0       # Numerical computing for RL
 scikit-learn>=1.3.0,<2.0.0 # Clustering for pattern extraction
-
-# Optional GCP integration
-google-cloud-bigquery>=3.11.0
-google-cloud-pubsub>=2.18.0
-google-cloud-storage>=2.10.0
-
-# Development dependencies
-pytest>=7.4.0              # Testing
-pytest-cov>=4.1.0          # Test coverage
-mypy>=1.5.0                # Type checking
-black>=23.7.0              # Code formatting
-isort>=5.12.0              # Import sorting
-ruff>=0.0.285              # Linting
-
-# Documentation
-mkdocs>=1.5.0              # Documentation generation
-mkdocs-material>=9.1.0     # Material theme
-mkdocstrings[python]>=0.22.0  # API docs
-
-# Type stubs
-types-setuptools

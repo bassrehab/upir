@@ -8,7 +8,7 @@
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Overview](#overview)
 - [Attribution](#attribution)
@@ -26,17 +26,17 @@
 
 ---
 
-## 🎯 Overview
+## Overview
 
 UPIR (Universal Plan Intermediate Representation) is an open-source framework for **formally specifying, verifying, synthesizing, and optimizing distributed system architectures**. It bridges the gap between high-level architectural requirements and production-ready implementations.
 
 ### What UPIR Does
 
-- ✅ **Formal Verification**: Prove that your architecture satisfies correctness properties using SMT solvers
-- 🔧 **Automatic Synthesis**: Generate implementation code from architectural specifications using CEGIS
-- 📈 **Continuous Optimization**: Learn from production metrics to improve architectures using reinforcement learning
-- 🎨 **Pattern Management**: Extract and reuse proven architectural patterns
-- 🔍 **Incremental Verification**: Cache proofs for faster iteration
+- **Formal Verification**: Prove that your architecture satisfies correctness properties using SMT solvers
+- **Automatic Synthesis**: Generate implementation code from architectural specifications using CEGIS
+- **Continuous Optimization**: Learn from production metrics to improve architectures using reinforcement learning
+- **Pattern Management**: Extract and reuse proven architectural patterns
+- **Incremental Verification**: Cache proofs for faster iteration
 
 ### Why UPIR?
 
@@ -50,7 +50,7 @@ UPIR automates these processes using **formal methods**, **program synthesis**, 
 
 ---
 
-## 📜 Attribution
+## Attribution
 
 This is a **clean-room implementation** based solely on public sources:
 
@@ -59,12 +59,14 @@ This is a **clean-room implementation** based solely on public sources:
 Additional references listed in [SOURCES.md](SOURCES.md).
 
 **Author**: Subhadip Mitra
+
 **License**: Apache 2.0
-**Project Status**: Personal open source project, not affiliated with Google
+
+**Project Status**: Personal open source project, no affiliations
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 ### 1. Formal Specifications with Temporal Logic
 
@@ -149,7 +151,7 @@ for pattern, score in matches:
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### Prerequisites
 
@@ -160,8 +162,8 @@ for pattern, score in matches:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/upir-open.git
-cd upir-open
+git clone https://github.com/bassrehab/upir.git
+cd upir
 
 # Create virtual environment
 python -m venv venv
@@ -188,7 +190,7 @@ python -c "import upir; print('UPIR installed successfully')"
 
 ---
 
-## 🎓 Quick Start
+## Quick Start
 
 Here's a complete example of designing a streaming pipeline with UPIR:
 
@@ -264,7 +266,7 @@ See [examples/streaming_example.py](examples/streaming_example.py) for a complet
 
 ---
 
-## 📚 Core Concepts
+## Core Concepts
 
 ### 1. UPIR Instance
 
@@ -409,7 +411,7 @@ template = best_pattern.template
 
 ---
 
-## 💡 Usage Examples
+## Usage Examples
 
 ### Example 1: Verify Latency Requirements
 
@@ -525,7 +527,7 @@ streaming_patterns = library.search_patterns({
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 UPIR is organized into five main modules:
 
@@ -570,7 +572,7 @@ core ←─── verification
 
 ---
 
-## 📖 API Documentation
+## API Documentation
 
 ### Core Classes
 
@@ -707,7 +709,7 @@ class PatternLibrary:
 
 ---
 
-## 📂 Examples
+## Examples
 
 The `examples/` directory contains complete demonstrations:
 
@@ -715,13 +717,13 @@ The `examples/` directory contains complete demonstrations:
 
 Complete workflow for real-time event processing pipeline:
 
-1. ✅ Define formal specification with temporal properties
-2. ✅ Create UPIR with Pub/Sub → Beam → BigQuery architecture
-3. ✅ Verify specification (all properties proved)
-4. ✅ Synthesize Apache Beam implementation
-5. ✅ Simulate production metrics
-6. ✅ Optimize using RL (3 iterations: 95ms → 79ms latency)
-7. ✅ Extract and save pattern for reuse
+1. Define formal specification with temporal properties
+2. Create UPIR with Pub/Sub → Beam → BigQuery architecture
+3. Verify specification (all properties proved)
+4. Synthesize Apache Beam implementation
+5. Simulate production metrics
+6. Optimize using RL (3 iterations: 95ms → 79ms latency)
+7. Extract and save pattern for reuse
 
 **Run:**
 ```bash
@@ -730,7 +732,7 @@ PYTHONPATH=. python examples/streaming_example.py
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
@@ -738,8 +740,8 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/upir-open.git
-cd upir-open
+git clone https://github.com/bassrehab/upir.git
+cd upir
 
 # Create development environment
 python -m venv venv
@@ -761,20 +763,19 @@ isort upir/ tests/
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **Apache License 2.0** - see the [LICENSE](LICENSE) file for details.
 
 ### Summary
 
-- ✅ **Free to use** for commercial and non-commercial purposes
-- ✅ **Modify and distribute** with attribution
-- ✅ **Patent grant** from contributors
-- ⚠️ **No warranty** provided
+- **Free to use** for commercial and non-commercial purposes
+- **Modify and distribute** with attribution
+- ⚠**No warranty** provided
 
 ---
 
-## 📚 References
+## References
 
 ### Primary Source
 
@@ -807,15 +808,15 @@ Licensed under CC BY 4.0
 
 ---
 
-## 📞 Contact & Support
+## Contact & Support
 
 - **Author**: Subhadip Mitra
-- **Issues**: [GitHub Issues](https://github.com/yourusername/upir-open/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/upir-open/discussions)
+- **Issues**: [GitHub Issues](https://github.com/bassrehab/upir/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/bassrehab/upir/discussions)
 
 ---
 
-## 🌟 Acknowledgments
+## Acknowledgments
 
 - **TD Commons** for publishing the foundational disclosure
 - **Apache Software Foundation** for Beam and other tools
@@ -828,6 +829,6 @@ Licensed under CC BY 4.0
 
 **Built with ❤️ for the distributed systems community**
 
-[⭐ Star on GitHub](https://github.com/yourusername/upir-open) | [🐛 Report Bug](https://github.com/yourusername/upir-open/issues) | [💡 Request Feature](https://github.com/yourusername/upir-open/issues)
+[⭐ Star on GitHub](https://github.com/bassrehab/upir) | [🐛 Report Bug](https://github.com/bassrehab/upir/issues) | [💡 Request Feature](https://github.com/bassrehab/upir/issues)
 
 </div>

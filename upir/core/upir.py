@@ -43,11 +43,11 @@ class UPIR:
     - Reasoning graph (decisions, rationale, confidence propagation)
 
     Attributes:
-        id: Unique identifier (UUID)
-        name: Human-readable name for this UPIR instance
-        description: Description of the system being represented
         specification: Formal specification with invariants and properties
         architecture: Architecture representation (components, connections)
+        id: Unique identifier (auto-generated UUID if not provided)
+        name: Human-readable name for this UPIR instance (default: "")
+        description: Description of the system being represented (default: "")
         evidence: Dictionary of evidence keyed by evidence ID
         reasoning: Dictionary of reasoning nodes keyed by node ID
         metadata: Additional metadata (tags, owner, project, etc.)
@@ -55,25 +55,29 @@ class UPIR:
         updated_at: When this UPIR was last modified (UTC)
 
     Example:
+        >>> # Simple usage with defaults
         >>> upir = UPIR(
-        ...     id=str(uuid.uuid4()),
-        ...     name="E-commerce Platform",
-        ...     description="High-throughput e-commerce system",
         ...     specification=FormalSpecification(...),
         ...     architecture=Architecture(...)
         ... )
-        >>> evidence_id = upir.add_evidence(Evidence(...))
+        >>> # Or with explicit metadata
+        >>> upir = UPIR(
+        ...     specification=spec,
+        ...     architecture=arch,
+        ...     name="E-commerce Platform",
+        ...     description="High-throughput e-commerce system"
+        ... )
         >>> upir.validate()
         True
 
     References:
     - TD Commons: UPIR structure and components
     """
-    id: str
-    name: str
-    description: str
     specification: Optional[FormalSpecification] = None
     architecture: Optional[Architecture] = None
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    name: str = ""
+    description: str = ""
     evidence: Dict[str, Evidence] = field(default_factory=dict)
     reasoning: Dict[str, ReasoningNode] = field(default_factory=dict)
     metadata: Dict[str, Any] = field(default_factory=dict)
@@ -84,8 +88,6 @@ class UPIR:
         """Validate UPIR fields."""
         if not self.id:
             raise ValueError("ID cannot be empty")
-        if not self.name:
-            raise ValueError("Name cannot be empty")
 
     @staticmethod
     def generate_id() -> str:

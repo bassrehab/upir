@@ -55,3 +55,7 @@ ENV/
 dmypy.json
 /PUBLISHING_CHECKLIST.md
 site/
+/IMPLEMENTATION_REVIEW.md
+dist/
+build/
+*.egg-info/

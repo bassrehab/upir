@@ -26,7 +26,7 @@ setup(
     url="https://github.com/bassrehab/upir",
     license="Apache-2.0",
     packages=find_packages(exclude=["tests", "tests.*", "examples", "docs"]),
-    python_requires=">=3.11",
+    python_requires=">=3.9",
     install_requires=[
         "z3-solver>=4.12.2",
         "numpy>=1.24.3,<2.0.0",

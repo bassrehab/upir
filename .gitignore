@@ -54,3 +54,4 @@ ENV/
 .dmypy.json
 dmypy.json
 /PUBLISHING_CHECKLIST.md
+site/

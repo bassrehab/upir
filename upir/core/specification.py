@@ -188,6 +188,23 @@ class FormalSpecification:
             "assumptions": sorted(self.assumptions)
         }
 
+    def to_json(self) -> str:
+        """
+        Serialize formal specification to JSON string.
+
+        Returns:
+            JSON string representation
+
+        Example:
+            >>> spec = FormalSpecification(
+            ...     constraints={"latency": {"max": 100}}
+            ... )
+            >>> json_str = spec.to_json()
+            >>> isinstance(json_str, str)
+            True
+        """
+        return json.dumps(self.to_dict(), indent=2)
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "FormalSpecification":
         """

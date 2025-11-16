@@ -86,6 +86,21 @@ class Architecture:
             "patterns": self.patterns.copy()
         }
 
+    def to_json(self) -> str:
+        """
+        Serialize architecture to JSON string.
+
+        Returns:
+            JSON string representation
+
+        Example:
+            >>> arch = Architecture(components=[{"id": "c1"}])
+            >>> json_str = arch.to_json()
+            >>> isinstance(json_str, str)
+            True
+        """
+        return json.dumps(self.to_dict(), indent=2)
+
     def hash(self) -> str:
         """
         Generate SHA-256 hash of this architecture.
@@ -140,6 +155,55 @@ class Architecture:
             deployment=data.get("deployment", {}),
             patterns=data.get("patterns", [])
         )
+
+    @property
+    def total_latency_ms(self) -> float:
+        """
+        Total latency across all components and connections.
+
+        Sums latency_ms from all components and connections.
+
+        Returns:
+            Total latency in milliseconds
+
+        Example:
+            >>> arch = Architecture(
+            ...     components=[
+            ...         {"id": "api", "latency_ms": 10.0},
+            ...         {"id": "db", "latency_ms": 50.0}
+            ...     ],
+            ...     connections=[
+            ...         {"from": "api", "to": "db", "latency_ms": 5.0}
+            ...     ]
+            ... )
+            >>> arch.total_latency_ms
+            65.0
+        """
+        component_latency = sum(c.get("latency_ms", 0.0) for c in self.components)
+        connection_latency = sum(c.get("latency_ms", 0.0) for c in self.connections)
+        return component_latency + connection_latency
+
+    @property
+    def total_cost(self) -> float:
+        """
+        Total monthly cost of all components.
+
+        Sums cost_monthly from all components.
+
+        Returns:
+            Total monthly cost in USD
+
+        Example:
+            >>> arch = Architecture(
+            ...     components=[
+            ...         {"id": "api", "cost_monthly": 300.0},
+            ...         {"id": "db", "cost_monthly": 500.0}
+            ...     ]
+            ... )
+            >>> arch.total_cost
+            800.0
+        """
+        return sum(c.get("cost_monthly", 0.0) for c in self.components)
 
     def __str__(self) -> str:
         """Human-readable string representation."""

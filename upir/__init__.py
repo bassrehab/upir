@@ -21,7 +21,7 @@ from upir.core.specification import FormalSpecification
 from upir.core.temporal import TemporalOperator, TemporalProperty
 from upir.verification.verifier import Verifier
 from upir.synthesis.cegis import Synthesizer
-from upir.learning.rl_optimizer import RLOptimizer
+from upir.learning.learner import ArchitectureLearner
 from upir.patterns.pattern import Pattern
 from upir.patterns.extractor import PatternExtractor
 from upir.patterns.library import PatternLibrary
@@ -38,7 +38,7 @@ __all__ = [
     # Synthesis
     "Synthesizer",
     # Learning
-    "RLOptimizer",
+    "ArchitectureLearner",
     # Patterns
     "Pattern",
     "PatternExtractor",

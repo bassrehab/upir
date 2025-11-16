@@ -14,7 +14,7 @@ License: Apache 2.0
 import numpy as np
 import pytest
 
-from upir.learning.ppo import PPO, PPOConfig, PolicyNetwork
+from upir.learning.ppo import PPO, PolicyNetwork, PPOConfig
 
 
 class TestPPOConfig:

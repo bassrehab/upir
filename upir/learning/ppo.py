@@ -17,7 +17,7 @@ License: Apache 2.0
 
 import logging
 from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
 import numpy as np
 

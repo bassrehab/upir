@@ -12,7 +12,6 @@ License: Apache 2.0
 """
 
 import numpy as np
-import pytest
 
 from upir.core.architecture import Architecture
 from upir.core.specification import FormalSpecification

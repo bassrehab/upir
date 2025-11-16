@@ -15,6 +15,7 @@ License: Apache 2.0
 from datetime import datetime
 
 import pytest
+
 from upir.core.temporal import TemporalOperator, TemporalProperty
 from upir.verification.solver import (
     ProofCertificate,

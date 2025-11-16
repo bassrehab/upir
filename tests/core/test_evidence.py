@@ -15,9 +15,10 @@ License: Apache 2.0
 
 import math
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import pytest
+
 from upir.core.evidence import Evidence, ReasoningNode
 
 

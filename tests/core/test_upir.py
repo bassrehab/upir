@@ -17,10 +17,10 @@ License: Apache 2.0
 from datetime import datetime
 
 import pytest
+
 from upir.core.architecture import Architecture
 from upir.core.evidence import Evidence, ReasoningNode
 from upir.core.specification import FormalSpecification
-from upir.core.temporal import TemporalOperator, TemporalProperty
 from upir.core.upir import UPIR
 
 
@@ -164,10 +164,11 @@ class TestUPIRCreation:
         with pytest.raises(ValueError, match="ID cannot be empty"):
             UPIR(id="", name="test", description="test")
 
-    def test_empty_name_rejected(self):
-        """Test that empty name is rejected."""
-        with pytest.raises(ValueError, match="Name cannot be empty"):
-            UPIR(id="upir-1", name="", description="test")
+    def test_empty_name_allowed(self):
+        """Test that empty name is allowed (defaults to empty string)."""
+        upir = UPIR(name="", description="test")
+        assert upir.name == ""
+        assert upir.id  # Should have auto-generated ID
 
 
 class TestUPIREvidenceManagement:

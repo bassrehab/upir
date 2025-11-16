@@ -13,6 +13,7 @@ License: Apache 2.0
 """
 
 import pytest
+
 from upir.core.temporal import TemporalOperator, TemporalProperty
 
 
@@ -133,7 +134,7 @@ class TestTemporalPropertySMT:
         smt = prop.to_smt()
         assert "forall" in smt
         assert "data_consistent" in smt
-        assert "(forall ((t Real)) (data_consistent t))" == smt
+        assert smt == "(forall ((t Real)) (data_consistent t))"
 
     def test_eventually_to_smt(self):
         """Test EVENTUALLY operator converts to existential quantification."""
@@ -144,7 +145,7 @@ class TestTemporalPropertySMT:
         smt = prop.to_smt()
         assert "exists" in smt
         assert "request_processed" in smt
-        assert "(exists ((t Real)) (request_processed t))" == smt
+        assert smt == "(exists ((t Real)) (request_processed t))"
 
     def test_within_to_smt(self):
         """Test WITHIN operator converts to bounded existential."""

@@ -17,11 +17,10 @@ import copy
 import logging
 from collections import deque
 from dataclasses import dataclass
-from typing import Any, Deque, Dict, List, Tuple
+from typing import Deque, Dict
 
 import numpy as np
 
-from upir.core.architecture import Architecture
 from upir.core.specification import FormalSpecification
 from upir.core.upir import UPIR
 from upir.learning.ppo import PPO, PPOConfig

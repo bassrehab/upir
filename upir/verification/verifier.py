@@ -15,8 +15,6 @@ Author: Subhadip Mitra
 License: Apache 2.0
 """
 
-import hashlib
-import json
 import logging
 import time
 from typing import Any, Dict, List, Optional, Set
@@ -28,8 +26,8 @@ from upir.verification.solver import (
     ProofCertificate,
     VerificationResult,
     VerificationStatus,
-    is_z3_available,
     get_z3_version,
+    is_z3_available,
 )
 
 # Import Z3 if available
@@ -781,7 +779,7 @@ class Verifier:
                 for decl in model.decls():
                     counterexample[decl.name()] = str(model[decl])
                 return counterexample
-        except:
+        except Exception:
             pass
 
         return None

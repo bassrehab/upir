@@ -15,16 +15,16 @@ __author__ = "Subhadip Mitra"
 __license__ = "Apache 2.0"
 
 # Main exports
-from upir.core.upir import UPIR
 from upir.core.architecture import Architecture
 from upir.core.specification import FormalSpecification
 from upir.core.temporal import TemporalOperator, TemporalProperty
-from upir.verification.verifier import Verifier
-from upir.synthesis.cegis import Synthesizer
+from upir.core.upir import UPIR
 from upir.learning.learner import ArchitectureLearner
-from upir.patterns.pattern import Pattern
 from upir.patterns.extractor import PatternExtractor
 from upir.patterns.library import PatternLibrary
+from upir.patterns.pattern import Pattern
+from upir.synthesis.cegis import Synthesizer
+from upir.verification.verifier import Verifier
 
 __all__ = [
     # Core classes

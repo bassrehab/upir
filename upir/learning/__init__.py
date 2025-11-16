@@ -8,7 +8,7 @@ License: Apache 2.0
 """
 
 from upir.learning.learner import ArchitectureLearner, Experience
-from upir.learning.ppo import PPO, PPOConfig, PolicyNetwork
+from upir.learning.ppo import PPO, PolicyNetwork, PPOConfig
 
 __all__ = [
     "PPO",

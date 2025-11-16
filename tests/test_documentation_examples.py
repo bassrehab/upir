@@ -12,23 +12,19 @@ Author: Subhadip Mitra
 License: Apache 2.0
 """
 
-import pytest
 from upir import (
     UPIR,
     Architecture,
     FormalSpecification,
-    TemporalProperty,
     TemporalOperator,
+    TemporalProperty,
     Verifier,
 )
 from upir.core.specification import FormalSpecification
 from upir.core.temporal import TemporalOperator, TemporalProperty
+from upir.patterns.library import PatternLibrary
 from upir.verification.solver import VerificationStatus
 from upir.verification.verifier import Verifier
-from upir.synthesis.cegis import Synthesizer
-from upir.learning.learner import ArchitectureLearner
-from upir.patterns.library import PatternLibrary
-from upir.patterns.extractor import PatternExtractor
 
 
 class TestQuickStartExamples:

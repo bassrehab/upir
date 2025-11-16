@@ -315,7 +315,7 @@ class Synthesizer:
                 )
 
             # Verify synthesized program
-            logger.info(f"Verifying synthesized program...")
+            logger.info("Verifying synthesized program...")
             verification_result = self.verify_synthesis(
                 implementation=implementation,
                 spec=upir.specification
@@ -912,7 +912,7 @@ def synthesized_function(inputs):
                             num = value.numerator_as_long()
                             den = value.denominator_as_long()
                             concrete_value = num / den if den != 0 else 0.0
-                        except:
+                        except Exception:
                             # Fallback to decimal approximation
                             concrete_value = float(value.as_decimal(10).replace("?", ""))
                     elif hole.hole_type == "predicate":

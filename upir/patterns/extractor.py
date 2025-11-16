@@ -15,7 +15,7 @@ License: Apache 2.0
 
 import logging
 from collections import Counter
-from typing import Any, Dict, List
+from typing import Dict, List
 
 import numpy as np
 from sklearn.cluster import KMeans

@@ -13,6 +13,7 @@ License: Apache 2.0
 """
 
 import pytest
+
 from upir.core.specification import FormalSpecification
 from upir.core.temporal import TemporalOperator, TemporalProperty
 from upir.core.upir import UPIR

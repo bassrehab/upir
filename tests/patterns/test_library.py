@@ -13,12 +13,8 @@ Author: Subhadip Mitra
 License: Apache 2.0
 """
 
-import json
 import tempfile
 from pathlib import Path
-
-import numpy as np
-import pytest
 
 from upir.core.architecture import Architecture
 from upir.core.specification import FormalSpecification

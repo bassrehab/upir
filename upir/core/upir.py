@@ -20,7 +20,7 @@ import json
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, Optional, Set
 
 from upir.core.architecture import Architecture
 from upir.core.evidence import Evidence, ReasoningNode

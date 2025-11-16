@@ -11,7 +11,6 @@ Author: Subhadip Mitra
 License: Apache 2.0
 """
 
-import numpy as np
 import pytest
 
 from upir.patterns.pattern import Pattern
